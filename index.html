@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Daily Checker & Admin Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .bg-gray-750 { background-color: #2d3748; }
+        .dragging {
+            opacity: 0.4;
+            scale: 0.95;
+            border-style: dashed !important;
+            border-color: #6366f1 !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-3 text-sm relative">
+
+    <!-- TOP GLOBAL NOTIFICATION TOAST -->
+    <div id="globalToast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 transform opacity-0 pointer-events-none transition-all duration-300 max-w-md w-full px-4">
+        <div id="toastContent" class="flex items-center gap-2 bg-gray-800 border px-4 py-2.5 rounded-lg shadow-2xl font-mono text-xs font-bold text-center justify-center">
+            <span id="toastIcon"></span><span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD HEADER -->
+    <div class="w-full max-w-5xl bg-gray-800 p-4 rounded-xl border border-gray-700 mb-4 shadow-xl text-center">
+        <h1 class="text-xl font-bold text-indigo-400 font-mono tracking-wide">🎮 GAME DAILY SYSTEM CONTROL</h1>
+        <p class="text-[11px] text-gray-400 font-mono mt-0.5">Database-Driven Multi-Account Automation Tool</p>
+    </div>
+
+    <!-- MENU TAB NAVIGASI UTAMA DASHBOARD -->
+    <div class="w-full max-w-5xl flex bg-gray-800 p-1.5 rounded-xl border border-gray-700 mb-4 gap-2 shadow-md">
+        <button id="tabClientBtn" class="flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg transition-all cursor-pointer bg-indigo-600 text-white shadow-lg">
+            📱 DASHBOARD ABSEN
+        </button>
+        <button id="tabAkunBtn" class="flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg transition-all cursor-pointer text-gray-400 hover:text-gray-200 hover:bg-gray-700/50">
+            👤 KELOLA DATA AKUN
+        </button>
+        <button id="tabTasksBtn" class="flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg transition-all cursor-pointer text-gray-400 hover:text-gray-200 hover:bg-gray-700/50">
+            📝 KELOLA TASK GAME
+        </button>
+    </div>
+
+    <!-- PANEL 1: DASHBOARD CLIENT (ABSEN UTAMA) -->
+    <div id="panelClient" class="w-full max-w-5xl space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full items-stretch">
+            <!-- SEKSI ABSEN KIRI -->
+            <div class="md:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between min-h-[305px]">
+                <div>
+                    <div class="mb-3">
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Pilih Akun / ID aktif:</label>
+                        <select id="accountSelect" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-1.5 text-xs text-white focus:outline-none cursor-pointer">
+                            <option value="" disabled selected>Memuat database Google Sheets...</option>
+                        </select>
+                    </div>
+
+                    <!-- STATUS BAR UTAMA -->
+                    <div id="accountInfoBar" class="hidden bg-gray-900/60 p-3 rounded-lg border border-gray-700/50 mb-3 text-[11px] text-gray-300 font-mono space-y-2">
+                        <div class="truncate border-b border-gray-800 pb-1 text-emerald-400 font-bold">
+                            🐾 Koleksi Pet Akun: <span id="infoPet" class="text-gray-300 font-normal flex flex-wrap gap-x-1.5 items-center">-</span>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">👤 Daftar Karakter Di Dalam Akun:</div>
+                            <div id="infoCharList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-[60px] overflow-y-auto pr-1"></div>
+                        </div>
+                    </div>
+
+                    <!-- LAUNCHER UTILITY CONTROL -->
+                    <div id="launcherControlBlock" class="grid grid-cols-2 gap-3 mb-3">
+                        <a id="openOAuthBtn" href="#" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-mono font-bold py-2 rounded-md text-[11px] text-center block shadow opacity-50 pointer-events-none">🔑 BUKA LINK OAUTH</a>
+                        <a id="startLauncherBtn" href="hivelauncher:?app_id=com.playwith.sealm.g.windows.hive&start_point=5&envi=" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-mono font-bold py-2 rounded-md text-[11px] text-center block shadow opacity-50 pointer-events-none">🚀 LAUNCHER GAME</a>
+                    </div>
+
+                    <!-- AREA CONTENT CHECKLIST -->
+                    <div id="mainContent" class="opacity-0 pointer-events-none transition-opacity duration-200">
+                        <hr class="border-gray-700 mb-2.5">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Daftar Task Harian</h3>
+                                <button id="checkAllBtn" class="text-[10px] bg-indigo-900/60 hover:bg-indigo-600 text-indigo-300 text-xs px-2 py-0.5 rounded font-bold">✅ Centang Semua</button>
+                            </div>
+                            <span id="progressCounter" class="text-xs bg-indigo-900 text-indigo-300 px-2 py-0.5 rounded-full font-mono">0/0</span>
+                        </div>
+                        <div id="todoList" class="grid grid-flow-col grid-rows-5 gap-2"></div>
+                    </div>
+                    <p id="placeholderText" class="text-xs text-gray-500 text-center py-10 border border-dashed border-gray-700 rounded-lg font-mono">Silakan pilih ID akun di atas untuk memulai.</p>
+                </div>
+                <div id="leftControlButtons" class="mt-4 grid grid-cols-2 gap-2 opacity-0 pointer-events-none"><button id="resetBtn" class="bg-rose-600/20 hover:bg-rose-600 text-rose-300 font-medium py-1.5 rounded text-xs">Reset Akun Ini</button><button id="resetAllBtn" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-1.5 rounded text-xs">Reset Total Harian</button></div>
+            </div>
+
+            <!-- PANEL RIGHT: STATUS LOGIN -->
+            <div class="bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between min-h-[305px]">
+                <div class="flex flex-col h-full overflow-hidden">
+                    <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2 font-mono flex items-center justify-between"><span>✅ SUDAH LOGIN (EMAIL)</span><span id="doneCounter" class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-full">0/0</span></h3>
+                    <hr class="border-gray-700 mb-3">
+                    <div class="grow overflow-y-auto pr-1 relative"><ul id="completedList" class="space-y-1.5"></ul><p id="noCompletedText" class="text-[11px] text-gray-500 text-center italic py-12 absolute inset-0 my-auto h-fit">Belum ada akun selesai.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIVE MONITORING DATABASE -->
+        <div class="w-full bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700">
+            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-3 font-mono">📊 DATABASE MONITORING SEMUA KARAKTER</h3>
+            <div class="overflow-x-auto rounded-lg border border-gray-700 max-h-[220px] overflow-y-auto shadow-inner">
+                <table class="w-full text-left border-collapse text-xs table-fixed">
+                    <thead class="sticky top-0 bg-gray-900 text-gray-400 font-mono border-b border-gray-700 text-[11px] z-10">
+                        <tr><th class="p-2.5 w-1/4">ID / Email Game</th><th class="p-2.5 w-1/6">Server</th><th class="p-2.5 w-1/6">Job</th><th class="p-2.5 w-1/6">Nickname</th><th class="p-2.5 w-1/12 text-center">Level</th><th class="p-2.5 w-1/4">Daftar Koleksi Pet</th></tr>
+                    </thead>
+                    <tbody id="summaryTableBody" class="divide-y divide-gray-700/60 bg-gray-850/30">
+                        <tr><td colspan="6" class="p-4 text-center text-gray-500 italic">Memuat database...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL 2: MANAJEMEN DATA AKUN (ADMIN PANEL) -->
+    <div id="panelAkun" class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch hidden">
+        <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
+            <div class="flex flex-col h-full justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 id="formTitle" class="text-xs font-bold text-indigo-400 font-mono uppercase tracking-wider">👤 Input Akun Baru</h2>
+                        <span id="editBadge" class="hidden text-[10px] bg-amber-950 text-amber-400 border border-amber-700/50 px-2 py-0.5 rounded font-mono font-bold animate-pulse">MODE EDIT</span>
+                    </div>
+                    <hr class="border-gray-700 mb-3">
+                    
+                    <form id="akunForm" class="space-y-3">
+                        <input type="hidden" id="old_nickname">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] text-gray-400 mb-1">ID / Email Akun:</label>
+                                <input type="text" id="id_akun" required placeholder="email@gmail.com" class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-white text-xs disabled:bg-gray-900/40 disabled:text-gray-500 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-400 mb-1">Nama Server:</label>
+                                <input type="text" id="server" required placeholder="Arus 07" class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-white text-xs">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-[11px] text-gray-400 mb-1">Job:</label>
+                                <select id="karakter" required class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-white text-xs">
+                                    <option value="" disabled selected>Pilih...</option>
+                                    <option value="Warrior">Warrior</option><option value="Knight">Knight</option><option value="Jester">Jester</option>
+                                    <option value="Mage">Mage</option><option value="Priest">Priest</option><option value="Cook">Cook</option><option value="Hunter">Hunter</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-400 mb-1">Nickname:</label>
+                                <input type="text" id="nickname" required placeholder="Nickname" class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-white text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-400 mb-1">Level:</label>
+                                <input type="number" id="level" required placeholder="60" class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-white text-xs font-mono text-center">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-gray-400 mb-1 flex justify-between items-center">
+                                <span>Daftar Koleksi Pet Akun:</span>
+                                <span class="text-[9px] text-indigo-400 lowercase font-mono italic">👋 drag-drop urutan</span>
+                            </label>
+                            <div id="petBadgeContainer" class="w-full bg-gray-900 border border-gray-600 rounded p-2 flex flex-wrap gap-1.5 min-h-[46px] items-center">
+                                <span id="petPlaceholder" class="text-[11px] text-gray-500 italic px-1">Belum ada pet dipilih...</span>
+                            </div>
+                            <div class="flex gap-1.5 mt-1.5 items-center">
+                                <input type="text" id="petInput" placeholder="Ketik pet baru..." class="grow bg-gray-700 border border-gray-600 rounded px-2.5 py-1 text-[11px] text-white">
+                                <button type="button" id="addManualPetBtn" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs font-bold">+</button>
+                            </div>
+                            <div class="mt-1.5"><label class="inline-flex items-center text-[11px] text-amber-400 cursor-pointer select-none"><input type="checkbox" id="isMythicCheck" class="w-3.5 h-3.5 text-amber-600 border-gray-600 rounded mr-1.5">Set sebagai Pet Mythic (⭐)</label></div>
+                            <p class="text-[10px] text-gray-400 mt-2 font-mono">⚡ HISTORI PET (KLIK KILAT):</p>
+                            <div id="petSuggestions" class="flex flex-wrap gap-1 mt-1 max-h-[70px] overflow-y-auto bg-gray-950/40 p-1.5 rounded border border-gray-700/60"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="flex gap-2 pt-4 border-t border-gray-700/60 mt-4">
+                    <button type="submit" form="akunForm" id="submitAkunBtn" class="grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded text-xs shadow">Simpan ke Google Sheets</button>
+                    <button type="button" id="cancelEditBtn" class="hidden bg-gray-700 text-gray-300 px-3 rounded text-xs">Batal</button>
+                </div>
+            </div>
+        </div>
+        <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
+            <div class="flex flex-col h-full">
+                <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-3 font-mono">🛠️ PANEL EDIT DATA AKUN</h3>
+                <div class="overflow-x-auto rounded-lg border border-gray-700 grow overflow-y-auto min-h-[380px] max-h-[420px]">
+                    <table class="w-full text-left border-collapse text-xs table-fixed">
+                        <thead class="sticky top-0 bg-gray-900 text-gray-400 font-mono border-b border-gray-700 text-[11px] z-10">
+                            <tr><th class="p-2 w-1/4">ID / Email</th><th class="p-2 w-1/5">Job</th><th class="p-2 w-1/5">Nickname</th><th class="p-2 w-1/12 text-center">Lvl</th><th class="p-2 w-1/6 text-center">Aksi</th></tr>
+                        </thead>
+                        <tbody id="adminTableBody" class="divide-y divide-gray-700/60 bg-gray-850/30"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL 3: MANAJEMEN TASK GAME -->
+    <div id="panelTasks" class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch hidden">
+        <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
+            <div class="flex flex-col h-full justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 id="taskFormTitle" class="text-xs font-bold text-emerald-400 font-mono uppercase tracking-wider">📝 Manajemen Task Harian</h2>
+                        <span id="taskEditBadge" class="hidden text-[10px] bg-amber-950 text-amber-400 border border-amber-700/50 px-2 py-0.5 rounded font-mono font-bold animate-pulse">MODE EDIT</span>
+                    </div>
+                    <hr class="border-gray-700 mb-4">
+                    <form id="taskForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">ID Kode Task (Tanpa Spasi / Kecil):</label>
+                            <input type="text" id="id_task" required placeholder="login_7day" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-1.5 text-white font-mono text-xs disabled:bg-gray-900/40 disabled:text-gray-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Nama Tugas / Task Harian:</label>
+                            <input type="text" id="nama_task" required placeholder="Selesaikan Dungeon" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-1.5 text-white text-xs">
+                        </div>
+                        <div class="relative">
+                            <label class="block text-xs text-gray-400 mb-1">Icon Emoji Visual:</label>
+                            <div class="flex gap-2 items-center">
+                                <input type="text" id="emoji" readonly required placeholder="Pilih..." class="bg-gray-700 border border-gray-600 rounded px-3 py-1.5 text-white text-center w-24 cursor-pointer font-bold text-xs">
+                                <span class="text-xs text-gray-500 italic">← Klik kotak emoji</span>
+                            </div>
+                            <div id="emojiPicker" class="hidden absolute left-0 mt-2 p-3 bg-gray-750 border border-gray-600 rounded-lg shadow-2xl z-50 w-64">
+                                <div class="grid grid-cols-6 gap-2 text-lg text-center">
+                                    <span class="cursor-pointer hover:bg-gray-600 rounded p-1">📅</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">👑</span>
+                                    <span class="cursor-pointer hover:bg-gray-600 rounded p-1">⚔️</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">🎁</span>
+                                    <span class="cursor-pointer hover:bg-gray-600 rounded p-1">🔑</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">🐾</span>
+                                    <span class="cursor-pointer hover:bg-gray-600 rounded p-1">🎟️</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">⚡</span>
+                                    <span class="cursor-pointer hover:bg-gray-600 rounded p-1">💎</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">💰</span>
+                                    <span class="cursor-pointer hover:bg-gray-600 rounded p-1">🔥</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">🌟</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="flex gap-2 pt-4 border-t border-gray-700/60 mt-4">
+                    <button type="submit" form="taskForm" id="submitTaskBtn" class="grow bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded text-xs shadow">🚀 Daftarkan Task Baru</button>
+                    <button type="button" id="cancelTaskEditBtn" class="hidden bg-gray-700 text-gray-300 px-3 rounded text-xs">Batal</button>
+                </div>
+            </div>
+        </div>
+        <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
+            <div class="flex flex-col h-full">
+                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3 font-mono">🛠️ PANEL EDIT TASK HARIAN</h3>
+                <div class="overflow-x-auto rounded-lg border border-gray-700 grow overflow-y-auto min-h-[330px] max-h-[370px]">
+                    <table class="w-full text-left border-collapse text-xs table-fixed">
+                        <thead class="sticky top-0 bg-gray-900 text-gray-400 font-mono border-b border-gray-700 text-[11px] z-10">
+                            <tr><th class="p-2 w-1/5 text-center">Ikon</th><th class="p-2 w-1/3">ID Kode</th><th class="p-2 w-1/3">Nama Tugas</th><th class="p-2 w-1/5 text-center">Aksi</th></tr>
+                        </thead>
+                        <tbody id="taskTableBody" class="divide-y divide-gray-700/60 bg-gray-850/30"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SYSTEM CORE LOGIC SINGLE SCRIPT -->
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygWFut0M7pfp0rxG-9dWC5u-ufjq5TEWorDy6bckhsgD3LiWXK4SVCtH9epPSowp3nIA/exec";
+        
+        let dbData = { akun: [], tasks: [] };
+        let isEditMode = false;
+        let isTaskEditMode = false;
+        let selectedPets = [];
+        let toastTimeout;
+
+        // DOM TAB SELECTION ELEMENTS
+        const tabClientBtn = document.getElementById('tabClientBtn');
+        const tabAkunBtn = document.getElementById('tabAkunBtn');
+        const tabTasksBtn = document.getElementById('tabTasksBtn');
+        const panelClient = document.getElementById('panelClient');
+        const panelAkun = document.getElementById('panelAkun');
+        const panelTasks = document.getElementById('panelTasks');
+
+        // DASHBOARD CLIENT ELEMENT DOM
+        const accountSelect = document.getElementById('accountSelect');
+        const accountInfoBar = document.getElementById('accountInfoBar');
+        const openOAuthBtn = document.getElementById('openOAuthBtn');
+        const startLauncherBtn = document.getElementById('startLauncherBtn');
+        const mainContent = document.getElementById('mainContent');
+        const placeholderText = document.getElementById('placeholderText');
+        const todoList = document.getElementById('todoList');
+        const progressCounter = document.getElementById('progressCounter');
+        const leftControlButtons = document.getElementById('leftControlButtons');
+        const completedList = document.getElementById('completedList');
+        const noCompletedText = document.getElementById('noCompletedText');
+        const doneCounter = document.getElementById('doneCounter');
+        const summaryTableBody = document.getElementById('summaryTableBody');
+        const resetBtn = document.getElementById('resetBtn');
+        const resetAllBtn = document.getElementById('resetAllBtn');
+        const checkAllBtn = document.getElementById('checkAllBtn');
+
+        // ADMIN TAB FORM COMPONENT DOM
+        const petBadgeContainer = document.getElementById('petBadgeContainer');
+        const petPlaceholder = document.getElementById('petPlaceholder');
+        const petInput = document.getElementById('petInput');
+        const addManualPetBtn = document.getElementById('addManualPetBtn');
+        const isMythicCheck = document.getElementById('isMythicCheck');
+        const petSuggestions = document.getElementById('petSuggestions');
+
+        // ========================= FIXED FEATURE: LOGIKA RESET OTOMATIS JAM 05:00 PAGI =========================
+        function checkDailyResetTime() {
+            const now = new Date();
+            
+            // Hitung target waktu penentu (Jam 5 pagi hari ini)
+            const resetTarget = new Date();
+            resetTarget.setHours(5, 0, 0, 0);
+            
+            let currentDayIdentifier = "";
+            
+            if (now >= resetTarget) {
+                // Jika sudah melewati jam 5 pagi, maka hari ini dihitung sebagai siklus baru tanggal sekarang
+                currentDayIdentifier = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+            } else {
+                // Jika masih dini hari (jam 00.00 s/d 04.59), maka masuk siklus hari kemarin
+                const yesterday = new Date(now);
+                yesterday.setDate(now.getDate() - 1);
+                currentDayIdentifier = yesterday.getFullYear() + "-" + (yesterday.getMonth() + 1) + "-" + yesterday.getDate();
+            }
+            
+            // Baca jejak penyimpanan terakhir di lokal storage
+            const lastSavedCycle = localStorage.getItem('game_absensi_cycle_date');
+            
+            if (lastSavedCycle !== currentDayIdentifier) {
+                // Siklus hari baru terdeteksi! Reset memori centangan lokal secara otomatis
+                localStorage.removeItem('game_absensi_data');
+                localStorage.setItem('game_absensi_cycle_date', currentDayIdentifier);
+                console.log("⚡ [Sistem Otomatis]: Siklus Baru Jam 05:00 Terlewati, Progress Absen Direset Bersih.");
+                showNotification("Siklus Baru Dimulai! Progress absen otomatis direset.");
+            }
+        }
+        // =====================================================================================================
+
+        // SWITCHING LOGIC TAB SYSTEM
+        tabClientBtn.addEventListener('click', () => {
+            tabClientBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg bg-indigo-600 text-white shadow-lg cursor-pointer";
+            tabAkunBtn.className = tabTasksBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-700/50 cursor-pointer";
+            panelClient.classList.remove('hidden'); panelAkun.classList.add('hidden'); panelTasks.classList.add('hidden');
+            exitEditMode(); exitTaskEditMode();
+        });
+
+        tabAkunBtn.addEventListener('click', () => {
+            tabAkunBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg bg-indigo-600 text-white shadow-lg cursor-pointer";
+            tabClientBtn.className = tabTasksBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-700/50 cursor-pointer";
+            panelAkun.classList.remove('hidden'); panelClient.classList.add('hidden'); panelTasks.classList.add('hidden');
+            exitTaskEditMode();
+        });
+
+        tabTasksBtn.addEventListener('click', () => {
+            tabTasksBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg bg-emerald-600 text-white shadow-lg cursor-pointer";
+            tabClientBtn.className = tabAkunBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-700/50 cursor-pointer";
+            panelTasks.classList.remove('hidden'); panelClient.classList.add('hidden'); panelAkun.classList.add('hidden');
+            exitEditMode();
+        });
+
+        function showNotification(message, type = 'success') {
+            const toast = document.getElementById('globalToast');
+            const content = document.getElementById('toastContent');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+            clearTimeout(toastTimeout);
+            msg.innerText = message;
+            if(type === 'success') {
+                icon.innerText = "✅"; content.className = "flex items-center gap-2 bg-emerald-950 border border-emerald-500 text-emerald-300 px-4 py-2.5 rounded-lg text-xs font-bold justify-center";
+            } else {
+                icon.innerText = "❌"; content.className = "flex items-center gap-2 bg-rose-950 border border-rose-500 text-rose-300 px-4 py-2.5 rounded-lg text-xs font-bold justify-center";
+            }
+            toast.className = "fixed top-4 left-1/2 -translate-x-1/2 z-50 transform opacity-100 max-w-md w-full px-4 transition-all duration-300";
+            toastTimeout = setTimeout(() => { toast.className = "fixed top-4 left-1/2 -translate-x-1/2 z-50 transform opacity-0 pointer-events-none max-w-md w-full px-4 transition-all duration-300"; }, 3000);
+        }
+
+        async function fetchDatabase() {
+            try {
+                // Panggil interor cek siklus waktu jam 05:00 sebelum render data dimulai
+                checkDailyResetTime();
+
+                const cacheBuster = new Date().getTime();
+                const response = await fetch(`${SCRIPT_URL}?_=${cacheBuster}`);
+                dbData = await response.json();
+                
+                todoList.innerHTML = '';
+                dbData.tasks.forEach(task => {
+                    todoList.innerHTML += `
+                        <label class="flex items-center p-2 bg-gray-750 rounded-lg border border-gray-700 cursor-pointer hover:bg-gray-700 transition-all text-xs">
+                            <input type="checkbox" data-task="${task.id}" class="w-4 h-4 text-indigo-600 border-gray-500 rounded bg-gray-700 shrink-0">
+                            <span class="ml-2 font-medium task-text truncate">${task.emoji} ${task.nama}</span>
+                        </label>
+                    `;
+                });
+                if (dbData.tasks.length % 5 !== 0) {
+                    const extraSlots = 5 - (dbData.tasks.length % 5);
+                    for (let s = 0; s < extraSlots; s++) todoList.innerHTML += '<div class="hidden sm:block"></div>';
+                }
+
+                buildPetSuggestions(extractUniquePets(dbData.akun));
+                renderSummaryTable();
+                renderAdminAkunTable();
+                renderAdminTaskTable();
+                initCheckboxListeners();
+                updateUI();
+            } catch (error) {
+                showNotification("Gagal memuat cloud database", "error");
+            }
+        }
+
+        function formatPetDisplayHTML(petString) {
+            if(!petString || petString === "-") return "-";
+            return petString.split(', ').map(pet => {
+                if(pet.startsWith('⭐')) {
+                    return `<span class="text-amber-400 font-bold bg-amber-950/40 px-1 py-0.5 rounded border border-amber-600/30">${pet}</span>`;
+                }
+                return `<span>${pet}</span>`;
+            }).join(' <span class="text-gray-600 font-bold mx-0.5">|</span> ');
+        }
+
+        function renderSummaryTable() {
+            summaryTableBody.innerHTML = '';
+            dbData.akun.forEach(acc => {
+                summaryTableBody.innerHTML += `
+                    <tr class="hover:bg-gray-700/40 transition-colors">
+                        <td class="p-2.5 font-medium font-mono text-gray-200 truncate">${acc.id}</td>
+                        <td class="p-2.5 text-gray-400 truncate">${acc.server}</td>
+                        <td class="p-2.5 text-indigo-300 font-semibold truncate">${acc.karakter}</td>
+                        <td class="p-2.5 text-sky-300 font-semibold truncate">${acc.nickname}</td>
+                        <td class="p-2.5 text-amber-400 font-bold text-center">${acc.level}</td>
+                        <td class="p-2.5 text-emerald-400" title="${acc.pet}">${formatPetDisplayHTML(acc.pet)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderAdminAkunTable() {
+            const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = '';
+            dbData.akun.forEach((acc, idx) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-700/40 transition-colors">
+                        <td class="p-2 font-mono text-gray-200 truncate" title="${acc.id}">${acc.id}</td>
+                        <td class="p-2 text-indigo-300 font-semibold truncate">${acc.karakter}</td>
+                        <td class="p-2 text-sky-300 font-semibold truncate">${acc.nickname}</td>
+                        <td class="p-2 text-amber-400 font-bold text-center">${acc.level}</td>
+                        <td class="p-2 text-center">
+                            <button onclick="triggerEdit(${idx})" class="bg-amber-600/20 hover:bg-amber-600 text-amber-400 hover:text-white px-2 py-0.5 rounded text-[11px] cursor-pointer">✏️ Edit</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderAdminTaskTable() {
+            const tbody = document.getElementById('taskTableBody'); tbody.innerHTML = '';
+            if(dbData.tasks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500">Belum ada task harian.</td></tr>'; return;
+            }
+            dbData.tasks.forEach((task, idx) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-700/40 transition-colors">
+                        <td class="p-2 text-center text-base">${task.emoji}</td>
+                        <td class="p-2 font-mono text-amber-400 font-semibold truncate">${task.id}</td>
+                        <td class="p-2 text-gray-200 font-medium truncate">${task.nama}</td>
+                        <td class="p-2 text-center">
+                            <button onclick="triggerTaskEdit(${idx})" class="bg-amber-600/20 hover:bg-amber-600 text-amber-400 hover:text-white px-2 py-0.5 rounded text-[11px] cursor-pointer">✏️ Edit</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function initCheckboxListeners() {
+            document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', (e) => { updateTextStyle(e.target); saveProgress(); });
+            });
+        }
+
+        function updateUI() {
+            const savedData = JSON.parse(localStorage.getItem('game_absensi_data')) || {};
+            const selectedBefore = accountSelect.value;
+            const validAccounts = dbData.akun.filter(acc => acc && acc.id && acc.id.trim() !== "");
+            const uniqueEmails = [...new Set(validAccounts.map(acc => acc.id.trim()))];
+
+            accountSelect.innerHTML = '<option value="" disabled selected class="text-gray-500">Pilih ID Akun...</option>';
+            completedList.innerHTML = '';
+
+            let doneCount = 0;
+            uniqueEmails.forEach(email => {
+                const accountData = savedData[email] || {};
+                let checkedCount = 0;
+                dbData.tasks.forEach(t => { if (accountData[t.id]) checkedCount++; });
+
+                if (dbData.tasks.length > 0 && checkedCount === dbData.tasks.length) {
+                    doneCount++;
+                    completedList.innerHTML += `
+                        <li class="flex items-center justify-between p-1.5 bg-gray-900/50 rounded border border-gray-700 text-xs">
+                            <span class="text-gray-400 truncate font-mono">✅ ${email}</span>
+                            <button onclick="undoAccount('${email}')" class="text-gray-500 hover:text-indigo-400 ml-1 cursor-pointer">↩️</button>
+                        </li>
+                    `;
+                } else {
+                    accountSelect.innerHTML += `<option value="${email}">${email}</option>`;
+                }
+            });
+
+            doneCounter.innerText = `${doneCount}/${uniqueEmails.length}`;
+            doneCount > 0 ? noCompletedText.classList.add('hidden') : noCompletedText.classList.remove('hidden');
+            accountSelect.value = (selectedBefore && accountSelect.querySelector(`option[value="${selectedBefore}"]`)) ? selectedBefore : "";
+            renderChecklistArea();
+        }
+
+        function renderChecklistArea() {
+            const currentAccount = accountSelect.value;
+            if (!currentAccount) {
+                mainContent.className = "opacity-0 pointer-events-none hidden";
+                leftControlButtons.className = "mt-4 grid grid-cols-2 gap-2 opacity-0 pointer-events-none";
+                accountInfoBar.classList.add('hidden'); placeholderText.classList.remove('hidden');
+                openOAuthBtn.classList.add('opacity-50', 'pointer-events-none'); startLauncherBtn.classList.add('opacity-50', 'pointer-events-none');
+                return;
+            }
+
+            mainContent.className = "opacity-100 transition-opacity duration-200";
+            leftControlButtons.className = "mt-4 grid grid-cols-2 gap-2 opacity-100 transition-opacity duration-200";
+            placeholderText.classList.add('hidden');
+            openOAuthBtn.classList.remove('opacity-50', 'pointer-events-none'); startLauncherBtn.classList.remove('opacity-50', 'pointer-events-none');
+
+            const listKarakter = dbData.akun.filter(a => a.id === currentAccount);
+            if (listKarakter.length > 0) {
+                document.getElementById('infoPet').innerHTML = formatPetDisplayHTML(listKarakter[0].pet);
+                openOAuthBtn.href = listKarakter[0].link ? listKarakter[0].link.trim() : "#";
+                document.getElementById('infoCharList').innerHTML = '';
+                listKarakter.forEach(char => {
+                    document.getElementById('infoCharList').innerHTML += `
+                        <div class="bg-gray-850 p-1 rounded border border-gray-800 text-[10px] truncate flex justify-between items-center">
+                            <span class="text-sky-300 font-bold truncate">🏷️ ${char.nickname}</span>
+                            <span class="text-gray-400 text-[9px] shrink-0 ml-1">(${char.karakter} Lvl.${char.level})</span>
+                        </div>
+                    `;
+                });
+                accountInfoBar.classList.remove('hidden');
+            }
+
+            const savedData = JSON.parse(localStorage.getItem('game_absensi_data')) || {};
+            const accountData = savedData[currentAccount] || {};
+            let currentChecked = 0;
+            
+            document.querySelectorAll('#todoList input[type="checkbox"]').forEach(checkbox => {
+                const isChecked = accountData[checkbox.getAttribute('data-task')] || false;
+                checkbox.checked = isChecked;
+                if(isChecked) currentChecked++;
+                updateTextStyle(checkbox);
+            });
+            progressCounter.innerText = `${currentChecked}/${dbData.tasks.length}`;
+        }
+
+        function saveProgress() {
+            const currentAccount = accountSelect.value; if (!currentAccount) return;
+            const savedData = JSON.parse(localStorage.getItem('game_absensi_data')) || {};
+            if (!savedData[currentAccount]) savedData[currentAccount] = {};
+            document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb => { savedData[currentAccount][cb.getAttribute('data-task')] = cb.checked; });
+            localStorage.setItem('game_absensi_data', JSON.stringify(savedData));
+            updateUI();
+        }
+
+        function updateTextStyle(cb) { cb.checked ? cb.nextElementSibling.classList.add('line-through', 'text-gray-500') : cb.nextElementSibling.classList.remove('line-through', 'text-gray-500'); }
+        window.undoAccount = function(id) {
+            const savedData = JSON.parse(localStorage.getItem('game_absensi_data')) || {};
+            if (savedData[id] && dbData.tasks.length > 0) {
+                savedData[id][dbData.tasks[dbData.tasks.length - 1].id] = false;
+                localStorage.setItem('game_absensi_data', JSON.stringify(savedData));
+                updateUI(); accountSelect.value = id; renderChecklistArea();
+            }
+        }
+
+        checkAllBtn.addEventListener('click', () => {
+            if (!accountSelect.value) return;
+            document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb => { cb.checked = true; updateTextStyle(cb); });
+            saveProgress();
+        });
+        accountSelect.addEventListener('change', renderChecklistArea);
+        resetBtn.addEventListener('click', () => { if(confirm("Reset akun ini?")) { document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb => cb.checked = false); saveProgress(); } });
+        resetAllBtn.addEventListener('click', () => { if(confirm("Hapus semua progress?")) { localStorage.removeItem('game_absensi_data'); updateUI(); } });
+
+        // ADMIN INTERACTION LOGIC (AKUN)
+        function renderPetBadges() {
+            petBadgeContainer.innerHTML = '';
+            if (selectedPets.length === 0) { petBadgeContainer.appendChild(petPlaceholder); return; }
+            selectedPets.forEach((petName, idx) => {
+                const isMythic = petName.startsWith('⭐'); const badge = document.createElement('div');
+                badge.setAttribute('draggable', 'true'); badge.setAttribute('data-index', idx);
+                badge.className = isMythic ? "flex items-center bg-amber-950/80 text-amber-300 border border-amber-600/60 text-[11px] font-mono px-2 py-1 rounded gap-1.5 cursor-grab active:cursor-grabbing shadow" : "flex items-center bg-indigo-900/60 text-indigo-200 border border-indigo-700/50 text-[11px] font-mono px-2 py-1 rounded gap-1.5 cursor-grab active:cursor-grabbing";
+                badge.innerHTML = `<span class="${isMythic ? 'text-amber-400' : 'text-indigo-400'} font-bold">☰</span><span>${petName}</span><button type="button" onclick="removePetBadge(${idx})" class="font-bold ml-0.5 text-xs">×</button>`;
+                badge.addEventListener('dragstart', (e) => { badge.classList.add('dragging'); e.dataTransfer.setData('text/plain', idx); });
+                badge.addEventListener('dragend', () => badge.classList.remove('dragging'));
+                petBadgeContainer.appendChild(badge);
+            });
+        }
+
+        petBadgeContainer.addEventListener('dragover', (e) => {
+            e.preventDefault(); const dragItem = document.querySelector('.dragging'); if (!dragItem) return;
+            const siblings = [...petBadgeContainer.querySelectorAll('[draggable="true"]:not(.dragging)')];
+            const nextSib = siblings.find(sib => { const b = sib.getBoundingClientRect(); return e.clientX <= b.left + b.width / 2 && e.clientY <= b.top + b.height / 2; });
+            if (nextSib) petBadgeContainer.insertBefore(dragItem, nextSib); else petBadgeContainer.appendChild(dragItem);
+        });
+        petBadgeContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            selectedPets = [...petBadgeContainer.querySelectorAll('[draggable="true"]')].map(b => b.childNodes[1].textContent.trim()).filter(n => n !== "");
+            renderPetBadges();
+        });
+
+        window.removePetBadge = function(index) { selectedPets.splice(index, 1); renderPetBadges(); }
+        function addPetToCollection(pName) {
+            let name = pName.trim(); if (!name) return;
+            if(name.startsWith('⭐')) name = name.replace('⭐', '').trim();
+            if(isMythicCheck.checked) name = `⭐ ${name}`;
+            selectedPets.push(name); renderPetBadges(); isMythicCheck.checked = false;
+        }
+        addManualPetBtn.addEventListener('click', () => { addPetToCollection(petInput.value); petInput.value = ""; });
+
+        function extractUniquePets(accounts) {
+            let list = []; accounts.forEach(a => { if (a.pet && a.pet !== "-") a.pet.split(',').forEach(p => { let n = p.trim().replace('⭐', '').trim(); if(n && !list.includes(n)) list.push(n); })});
+            return list.sort();
+        }
+        function buildPetSuggestions(uniques) {
+            petSuggestions.innerHTML = '';
+            uniques.forEach(p => {
+                const s = document.createElement('span'); s.className = "bg-gray-700 hover:bg-emerald-600 text-[10px] px-2 py-0.5 rounded cursor-pointer text-gray-300";
+                s.innerText = p; s.addEventListener('click', () => addPetToCollection(p)); petSuggestions.appendChild(s);
+            });
+        }
+
+        window.triggerEdit = function(index) {
+            const acc = dbData.akun[index]; isEditMode = true;
+            document.getElementById('id_akun').value = acc.id; document.getElementById('id_akun').disabled = true;
+            document.getElementById('server').value = acc.server; document.getElementById('karakter').value = acc.karakter;
+            document.getElementById('nickname').value = acc.nickname; document.getElementById('old_nickname').value = acc.nickname;
+            document.getElementById('level').value = acc.level; selectedPets = (acc.pet && acc.pet !== "-") ? acc.pet.split(', ').filter(Boolean) : [];
+            renderPetBadges(); document.getElementById('formTitle').innerText = "✏️ Edit Data Akun";
+            document.getElementById('submitAkunBtn').innerText = "Update Data Akun"; document.getElementById('submitAkunBtn').className = "grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer";
+            document.getElementById('editBadge').classList.remove('hidden'); document.getElementById('cancelEditBtn').classList.remove('hidden');
+        }
+        function exitEditMode() {
+            isEditMode = false; document.getElementById('akunForm').reset(); document.getElementById('id_akun').disabled = false;
+            selectedPets = []; renderPetBadges(); document.getElementById('formTitle').innerText = "👤 Input Akun Baru";
+            document.getElementById('submitAkunBtn').innerText = "Simpan ke Google Sheets"; document.getElementById('submitAkunBtn').className = "grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer";
+            document.getElementById('editBadge').classList.add('hidden'); document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+        document.getElementById('cancelEditBtn').addEventListener('click', exitEditMode);
+
+        document.getElementById('akunForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = { action: isEditMode ? "updateAkun" : "addAkun", id_akun: document.getElementById('id_akun').value.trim(), server: document.getElementById('server').value.trim(), karakter: document.getElementById('karakter').value, nickname: document.getElementById('nickname').value.trim(), old_nickname: document.getElementById('old_nickname').value.trim(), level: document.getElementById('level').value.trim(), pet: selectedPets.length > 0 ? selectedPets.join(', ') : "-" };
+            showNotification("Memproses ke cloud database..."); exitEditMode();
+            try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); setTimeout(fetchDatabase, 1500); } catch (err) { setTimeout(fetchDatabase, 1500); }
+        });
+
+        // ADMIN INTERACTION LOGIC (TASK EDIT)
+        const emojiInput = document.getElementById('emoji'); const emojiPicker = document.getElementById('emojiPicker');
+        emojiInput.addEventListener('click', (e) => { e.stopPropagation(); emojiPicker.classList.toggle('hidden'); });
+        emojiPicker.querySelectorAll('span').forEach(s => s.addEventListener('click', () => { emojiInput.value = s.innerText; emojiPicker.classList.add('hidden'); }));
+        document.addEventListener('click', (e) => { if(!emojiPicker.contains(e.target) && e.target !== emojiInput) emojiPicker.classList.add('hidden'); });
+
+        window.triggerTaskEdit = function(index) {
+            const t = dbData.tasks[index]; isTaskEditMode = true;
+            document.getElementById('id_task').value = t.id; document.getElementById('id_task').disabled = true;
+            document.getElementById('nama_task').value = t.nama; document.getElementById('emoji').value = t.emoji;
+            document.getElementById('taskFormTitle').innerText = "✏️ Edit Tugas Harian";
+            document.getElementById('submitTaskBtn').innerText = "Update Data Task"; document.getElementById('submitTaskBtn').className = "grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer";
+            document.getElementById('taskEditBadge').classList.remove('hidden'); document.getElementById('cancelTaskEditBtn').classList.remove('hidden');
+        }
+        function exitTaskEditMode() {
+            isTaskEditMode = false; document.getElementById('taskForm').reset(); document.getElementById('id_task').disabled = false;
+            document.getElementById('taskFormTitle').innerText = "📝 Manajemen Task Harian";
+            document.getElementById('submitTaskBtn').innerText = "🚀 Daftarkan Task Baru"; document.getElementById('submitTaskBtn').className = "grow bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer";
+            document.getElementById('taskEditBadge').classList.add('hidden'); document.getElementById('cancelTaskEditBtn').classList.add('hidden');
+        }
+        document.getElementById('cancelTaskEditBtn').addEventListener('click', exitTaskEditMode);
+
+        document.getElementById('taskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = { action: isTaskEditMode ? "updateTask" : "addTask", id_task: document.getElementById('id_task').value.trim().toLowerCase().replace(/\s+/g, '_'), nama_task: document.getElementById('nama_task').value.trim(), emoji: document.getElementById('emoji').value.trim() };
+            showNotification("Menyimpan perubahan task..."); exitTaskEditMode();
+            try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); setTimeout(fetchDatabase, 1500); } catch (err) { setTimeout(fetchDatabase, 1500); }
+        });
+
+        document.addEventListener('DOMContentLoaded', fetchDatabase);
+    </script>
+</body>
+</html>
