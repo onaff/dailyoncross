@@ -56,14 +56,16 @@
                         </select>
                     </div>
 
-                    <!-- STATUS BAR UTAMA -->
-                    <div id="accountInfoBar" class="hidden bg-gray-900/60 p-3 rounded-lg border border-gray-700/50 mb-3 text-[11px] text-gray-300 font-mono space-y-2">
-                        <div class="truncate border-b border-gray-800 pb-1 text-emerald-400 font-bold">
-                            🐾 Koleksi Pet Akun: <span id="infoPet" class="text-gray-300 font-normal flex flex-wrap gap-x-1.5 items-center">-</span>
-                        </div>
+                    <!-- STATUS BAR UTAMA (POSISI SUDAH DITUKAR) -->
+                    <div id="accountInfoBar" class="hidden bg-gray-900/60 p-3 rounded-lg border border-gray-700/50 mb-3 text-[11px] text-gray-300 font-mono space-y-2.5">
+                        <!-- 1. Karakter muncul pertama -->
                         <div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">👤 Daftar Karakter Di Dalam Akun:</div>
                             <div id="infoCharList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-[60px] overflow-y-auto pr-1"></div>
+                        </div>
+                        <!-- 2. Koleksi Pet pindah di bawahnya -->
+                        <div class="truncate border-t border-gray-800 pt-1.5 text-emerald-400 font-bold">
+                            🐾 Koleksi Pet Akun: <span id="infoPet" class="text-gray-300 font-normal flex flex-wrap gap-x-1.5 items-center mt-1">-</span>
                         </div>
                     </div>
 
@@ -97,21 +99,6 @@
                     <hr class="border-gray-700 mb-3">
                     <div class="grow overflow-y-auto pr-1 relative"><ul id="completedList" class="space-y-1.5"></ul><p id="noCompletedText" class="text-[11px] text-gray-500 text-center italic py-12 absolute inset-0 my-auto h-fit">Belum ada akun selesai.</p></div>
                 </div>
-            </div>
-        </div>
-
-        <!-- LIVE MONITORING DATABASE -->
-        <div class="w-full bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700">
-            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-3 font-mono">📊 DATABASE MONITORING SEMUA KARAKTER</h3>
-            <div class="overflow-x-auto rounded-lg border border-gray-700 max-h-[220px] overflow-y-auto shadow-inner">
-                <table class="w-full text-left border-collapse text-xs table-fixed">
-                    <thead class="sticky top-0 bg-gray-900 text-gray-400 font-mono border-b border-gray-700 text-[11px] z-10">
-                        <tr><th class="p-2.5 w-1/4">ID / Email Game</th><th class="p-2.5 w-1/6">Server</th><th class="p-2.5 w-1/6">Job</th><th class="p-2.5 w-1/6">Nickname</th><th class="p-2.5 w-1/12 text-center">Level</th><th class="p-2.5 w-1/4">Daftar Koleksi Pet</th></tr>
-                    </thead>
-                    <tbody id="summaryTableBody" class="divide-y divide-gray-700/60 bg-gray-850/30">
-                        <tr><td colspan="6" class="p-4 text-center text-gray-500 italic">Memuat database...</td></tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
@@ -286,7 +273,6 @@
         const completedList = document.getElementById('completedList');
         const noCompletedText = document.getElementById('noCompletedText');
         const doneCounter = document.getElementById('doneCounter');
-        const summaryTableBody = document.getElementById('summaryTableBody');
         const resetBtn = document.getElementById('resetBtn');
         const resetAllBtn = document.getElementById('resetAllBtn');
         const checkAllBtn = document.getElementById('checkAllBtn');
@@ -299,38 +285,28 @@
         const isMythicCheck = document.getElementById('isMythicCheck');
         const petSuggestions = document.getElementById('petSuggestions');
 
-        // ========================= FIXED FEATURE: LOGIKA RESET OTOMATIS JAM 05:00 PAGI =========================
+        // LOGIKA RESET OTOMATIS JAM 05:00 PAGI
         function checkDailyResetTime() {
             const now = new Date();
-            
-            // Hitung target waktu penentu (Jam 5 pagi hari ini)
             const resetTarget = new Date();
             resetTarget.setHours(5, 0, 0, 0);
             
             let currentDayIdentifier = "";
-            
             if (now >= resetTarget) {
-                // Jika sudah melewati jam 5 pagi, maka hari ini dihitung sebagai siklus baru tanggal sekarang
                 currentDayIdentifier = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
             } else {
-                // Jika masih dini hari (jam 00.00 s/d 04.59), maka masuk siklus hari kemarin
                 const yesterday = new Date(now);
                 yesterday.setDate(now.getDate() - 1);
                 currentDayIdentifier = yesterday.getFullYear() + "-" + (yesterday.getMonth() + 1) + "-" + yesterday.getDate();
             }
             
-            // Baca jejak penyimpanan terakhir di lokal storage
             const lastSavedCycle = localStorage.getItem('game_absensi_cycle_date');
-            
             if (lastSavedCycle !== currentDayIdentifier) {
-                // Siklus hari baru terdeteksi! Reset memori centangan lokal secara otomatis
                 localStorage.removeItem('game_absensi_data');
                 localStorage.setItem('game_absensi_cycle_date', currentDayIdentifier);
-                console.log("⚡ [Sistem Otomatis]: Siklus Baru Jam 05:00 Terlewati, Progress Absen Direset Bersih.");
                 showNotification("Siklus Baru Dimulai! Progress absen otomatis direset.");
             }
         }
-        // =====================================================================================================
 
         // SWITCHING LOGIC TAB SYSTEM
         tabClientBtn.addEventListener('click', () => {
@@ -372,9 +348,7 @@
 
         async function fetchDatabase() {
             try {
-                // Panggil interor cek siklus waktu jam 05:00 sebelum render data dimulai
                 checkDailyResetTime();
-
                 const cacheBuster = new Date().getTime();
                 const response = await fetch(`${SCRIPT_URL}?_=${cacheBuster}`);
                 dbData = await response.json();
@@ -394,7 +368,6 @@
                 }
 
                 buildPetSuggestions(extractUniquePets(dbData.akun));
-                renderSummaryTable();
                 renderAdminAkunTable();
                 renderAdminTaskTable();
                 initCheckboxListeners();
@@ -412,22 +385,6 @@
                 }
                 return `<span>${pet}</span>`;
             }).join(' <span class="text-gray-600 font-bold mx-0.5">|</span> ');
-        }
-
-        function renderSummaryTable() {
-            summaryTableBody.innerHTML = '';
-            dbData.akun.forEach(acc => {
-                summaryTableBody.innerHTML += `
-                    <tr class="hover:bg-gray-700/40 transition-colors">
-                        <td class="p-2.5 font-medium font-mono text-gray-200 truncate">${acc.id}</td>
-                        <td class="p-2.5 text-gray-400 truncate">${acc.server}</td>
-                        <td class="p-2.5 text-indigo-300 font-semibold truncate">${acc.karakter}</td>
-                        <td class="p-2.5 text-sky-300 font-semibold truncate">${acc.nickname}</td>
-                        <td class="p-2.5 text-amber-400 font-bold text-center">${acc.level}</td>
-                        <td class="p-2.5 text-emerald-400" title="${acc.pet}">${formatPetDisplayHTML(acc.pet)}</td>
-                    </tr>
-                `;
-            });
         }
 
         function renderAdminAkunTable() {
@@ -614,6 +571,7 @@
         }
         addManualPetBtn.addEventListener('click', () => { addPetToCollection(petInput.value); petInput.value = ""; });
 
+        // FIXED EXTRACT UNIQUE PETS WITH STRIP MODIFIER
         function extractUniquePets(accounts) {
             let list = []; accounts.forEach(a => { if (a.pet && a.pet !== "-") a.pet.split(',').forEach(p => { let n = p.trim().replace('⭐', '').trim(); if(n && !list.includes(n)) list.push(n); })});
             return list.sort();
