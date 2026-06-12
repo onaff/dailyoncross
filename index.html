@@ -56,14 +56,12 @@
                         </select>
                     </div>
 
-                    <!-- STATUS BAR UTAMA (POSISI SUDAH DITUKAR) -->
+                    <!-- STATUS BAR UTAMA -->
                     <div id="accountInfoBar" class="hidden bg-gray-900/60 p-3 rounded-lg border border-gray-700/50 mb-3 text-[11px] text-gray-300 font-mono space-y-2.5">
-                        <!-- 1. Karakter muncul pertama -->
                         <div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">👤 Daftar Karakter Di Dalam Akun:</div>
                             <div id="infoCharList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-[60px] overflow-y-auto pr-1"></div>
                         </div>
-                        <!-- 2. Koleksi Pet pindah di bawahnya -->
                         <div class="truncate border-t border-gray-800 pt-1.5 text-emerald-400 font-bold">
                             🐾 Koleksi Pet Akun: <span id="infoPet" class="text-gray-300 font-normal flex flex-wrap gap-x-1.5 items-center mt-1">-</span>
                         </div>
@@ -164,17 +162,27 @@
                 </div>
                 <div class="flex gap-2 pt-4 border-t border-gray-700/60 mt-4">
                     <button type="submit" form="akunForm" id="submitAkunBtn" class="grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded text-xs shadow">Simpan ke Google Sheets</button>
-                    <button type="button" id="cancelEditBtn" class="hidden bg-gray-700 text-gray-300 px-3 rounded text-xs">Batal</button>
+                    <button type="button" id="cancelEditBtn" class="bg-gray-700 text-gray-300 px-3 rounded text-xs cursor-pointer">Reset / Baru</button>
                 </div>
             </div>
         </div>
+        
+        <!-- LIVE MONITORING EDIT DATA AKUN (AKSI DIHAPUS, KLIK BARIS AKTIF) -->
         <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full">
-                <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-3 font-mono">🛠️ PANEL EDIT DATA AKUN</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider font-mono">🛠️ PANEL DATA AKUN</h3>
+                    <span class="text-[9px] text-gray-400 font-mono italic">✨ Klik baris mana saja untuk edit data</span>
+                </div>
                 <div class="overflow-x-auto rounded-lg border border-gray-700 grow overflow-y-auto min-h-[380px] max-h-[420px]">
                     <table class="w-full text-left border-collapse text-xs table-fixed">
                         <thead class="sticky top-0 bg-gray-900 text-gray-400 font-mono border-b border-gray-700 text-[11px] z-10">
-                            <tr><th class="p-2 w-1/4">ID / Email</th><th class="p-2 w-1/5">Job</th><th class="p-2 w-1/5">Nickname</th><th class="p-2 w-1/12 text-center">Lvl</th><th class="p-2 w-1/6 text-center">Aksi</th></tr>
+                            <tr>
+                                <th class="p-2.5 w-1/3">ID / Email</th>
+                                <th class="p-2.5 w-1/5">Job</th>
+                                <th class="p-2.5 w-1/4">Nickname</th>
+                                <th class="p-2.5 w-1/7 text-center">Lvl</th>
+                            </tr>
                         </thead>
                         <tbody id="adminTableBody" class="divide-y divide-gray-700/60 bg-gray-850/30"></tbody>
                     </table>
@@ -387,18 +395,16 @@
             }).join(' <span class="text-gray-600 font-bold mx-0.5">|</span> ');
         }
 
+        // REVISI: RENDER DATA AKUN (AKSI DIHAPUS, BERUBAH JADI CLICKABLE ROW)
         function renderAdminAkunTable() {
             const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = '';
             dbData.akun.forEach((acc, idx) => {
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-700/40 transition-colors">
-                        <td class="p-2 font-mono text-gray-200 truncate" title="${acc.id}">${acc.id}</td>
-                        <td class="p-2 text-indigo-300 font-semibold truncate">${acc.karakter}</td>
-                        <td class="p-2 text-sky-300 font-semibold truncate">${acc.nickname}</td>
-                        <td class="p-2 text-amber-400 font-bold text-center">${acc.level}</td>
-                        <td class="p-2 text-center">
-                            <button onclick="triggerEdit(${idx})" class="bg-amber-600/20 hover:bg-amber-600 text-amber-400 hover:text-white px-2 py-0.5 rounded text-[11px] cursor-pointer">✏️ Edit</button>
-                        </td>
+                    <tr onclick="triggerEdit(${idx})" class="hover:bg-indigo-900/30 border-b border-gray-700/40 transition-colors cursor-pointer group">
+                        <td class="p-2.5 font-mono text-gray-200 truncate group-hover:text-indigo-300" title="${acc.id}">${acc.id}</td>
+                        <td class="p-2.5 text-indigo-300 font-semibold truncate">${acc.karakter}</td>
+                        <td class="p-2.5 text-sky-300 font-semibold truncate">${acc.nickname}</td>
+                        <td class="p-2.5 text-amber-400 font-bold text-center">${acc.level}</td>
                     </tr>
                 `;
             });
@@ -571,7 +577,6 @@
         }
         addManualPetBtn.addEventListener('click', () => { addPetToCollection(petInput.value); petInput.value = ""; });
 
-        // FIXED EXTRACT UNIQUE PETS WITH STRIP MODIFIER
         function extractUniquePets(accounts) {
             let list = []; accounts.forEach(a => { if (a.pet && a.pet !== "-") a.pet.split(',').forEach(p => { let n = p.trim().replace('⭐', '').trim(); if(n && !list.includes(n)) list.push(n); })});
             return list.sort();
@@ -584,6 +589,7 @@
             });
         }
 
+        // AKAN TERPANGGIL SAAT BARIS TABEL DIKLIK
         window.triggerEdit = function(index) {
             const acc = dbData.akun[index]; isEditMode = true;
             document.getElementById('id_akun').value = acc.id; document.getElementById('id_akun').disabled = true;
@@ -591,14 +597,15 @@
             document.getElementById('nickname').value = acc.nickname; document.getElementById('old_nickname').value = acc.nickname;
             document.getElementById('level').value = acc.level; selectedPets = (acc.pet && acc.pet !== "-") ? acc.pet.split(', ').filter(Boolean) : [];
             renderPetBadges(); document.getElementById('formTitle').innerText = "✏️ Edit Data Akun";
-            document.getElementById('submitAkunBtn').innerText = "Update Data Akun"; document.getElementById('submitAkunBtn').className = "grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer";
-            document.getElementById('editBadge').classList.remove('hidden'); document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('submitAkunBtn').innerText = "Update Data Akun"; document.getElementById('submitAkunBtn').className = "grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer transition-colors";
+            document.getElementById('editBadge').classList.remove('hidden');
         }
+        
         function exitEditMode() {
             isEditMode = false; document.getElementById('akunForm').reset(); document.getElementById('id_akun').disabled = false;
             selectedPets = []; renderPetBadges(); document.getElementById('formTitle').innerText = "👤 Input Akun Baru";
-            document.getElementById('submitAkunBtn').innerText = "Simpan ke Google Sheets"; document.getElementById('submitAkunBtn').className = "grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer";
-            document.getElementById('editBadge').classList.add('hidden'); document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('submitAkunBtn').innerText = "Simpan ke Google Sheets"; document.getElementById('submitAkunBtn').className = "grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer transition-colors";
+            document.getElementById('editBadge').classList.add('hidden');
         }
         document.getElementById('cancelEditBtn').addEventListener('click', exitEditMode);
 
