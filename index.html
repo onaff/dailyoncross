@@ -17,20 +17,17 @@
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-3 text-sm relative">
 
-    <!-- TOP GLOBAL NOTIFICATION TOAST -->
     <div id="globalToast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 transform opacity-0 pointer-events-none transition-all duration-300 max-w-md w-full px-4">
         <div id="toastContent" class="flex items-center gap-2 bg-gray-800 border px-4 py-2.5 rounded-lg shadow-2xl font-mono text-xs font-bold text-center justify-center">
             <span id="toastIcon"></span><span id="toastMessage"></span>
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD HEADER -->
     <div class="w-full max-w-5xl bg-gray-800 p-4 rounded-xl border border-gray-700 mb-4 shadow-xl text-center">
         <h1 class="text-xl font-bold text-indigo-400 font-mono tracking-wide">🎮 GAME DAILY SYSTEM CONTROL</h1>
         <p class="text-[11px] text-gray-400 font-mono mt-0.5">Cloud Database Synchronization Panel (No LocalStorage)</p>
     </div>
 
-    <!-- MENU TAB NAVIGASI UTAMA DASHBOARD -->
     <div class="w-full max-w-5xl flex bg-gray-800 p-1.5 rounded-xl border border-gray-700 mb-4 gap-2 shadow-md">
         <button id="tabClientBtn" class="flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg transition-all cursor-pointer bg-indigo-600 text-white shadow-lg">
             📱 DASHBOARD ABSEN
@@ -43,10 +40,8 @@
         </button>
     </div>
 
-    <!-- PANEL 1: DASHBOARD CLIENT (ABSEN UTAMA) -->
     <div id="panelClient" class="w-full max-w-5xl space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full items-stretch">
-            <!-- SEKSI ABSEN KIRI -->
             <div class="md:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between min-h-[305px]">
                 <div>
                     <div class="mb-3">
@@ -56,7 +51,6 @@
                         </select>
                     </div>
 
-                    <!-- STATUS BAR UTAMA -->
                     <div id="accountInfoBar" class="hidden bg-gray-900/60 p-3 rounded-lg border border-gray-700/50 mb-3 text-[11px] text-gray-300 font-mono space-y-2.5">
                         <div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">👤 Daftar Karakter Di Dalam Akun:</div>
@@ -67,13 +61,11 @@
                         </div>
                     </div>
 
-                    <!-- LAUNCHER UTILITY CONTROL -->
                     <div id="launcherControlBlock" class="grid grid-cols-2 gap-3 mb-3">
                         <a id="openOAuthBtn" href="#" target="_blank" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-mono font-bold py-2 rounded-md text-[11px] text-center block shadow opacity-50 pointer-events-none">🔑 BUKA LINK OAUTH</a>
                         <a id="startLauncherBtn" href="hivelauncher:?app_id=com.playwith.sealm.g.windows.hive&start_point=5&envi=" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-mono font-bold py-2 rounded-md text-[11px] text-center block shadow opacity-50 pointer-events-none">🚀 LAUNCHER GAME</a>
                     </div>
 
-                    <!-- AREA CONTENT CHECKLIST -->
                     <div id="mainContent" class="opacity-0 pointer-events-none transition-opacity duration-200">
                         <hr class="border-gray-700 mb-2.5">
                         <div class="flex justify-between items-center mb-2">
@@ -93,7 +85,6 @@
                 </div>
             </div>
 
-            <!-- PANEL RIGHT: STATUS LOGIN -->
             <div class="bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between min-h-[305px]">
                 <div class="flex flex-col h-full overflow-hidden">
                     <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2 font-mono flex items-center justify-between"><span>✅ SUDAH LOGIN (EMAIL)</span><span id="doneCounter" class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-full">0/0</span></h3>
@@ -104,7 +95,6 @@
         </div>
     </div>
 
-    <!-- PANEL 2: MANAJEMEN DATA AKUN (ADMIN PANEL) -->
     <div id="panelAkun" class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch hidden">
         <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full justify-between">
@@ -169,7 +159,6 @@
             </div>
         </div>
         
-        <!-- PANEL DATA AKUN (KLIK BARIS UNTUK EDIT) -->
         <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full">
                 <div class="flex justify-between items-center mb-3">
@@ -193,7 +182,6 @@
         </div>
     </div>
 
-    <!-- PANEL 3: MANAJEMEN TASK GAME -->
     <div id="panelTasks" class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch hidden">
         <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full justify-between">
@@ -250,10 +238,9 @@
         </div>
     </div>
 
-    <!-- SYSTEM CORE LOGIC SINGLE SCRIPT -->
     <script>
         // ⚠️ MASUKKAN SCRIPT URL HASIL DEPLOY WEB APP GOOGLE SHEETS ANDA DI BAWAH INI:
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysyh0HaA6cxx3XTDPBi3m8QTsHRI9Bs5zMVdFXVFhZBwwjLXZpLfdGz_FYo68UVRgjJw/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaMe5AW7_KH_LcQ5mSy-PJTIjudijlkxGE3N_U4zZLKfBGPbmAf3_DlGalE35bW_Y4/exec";
         
         let dbData = { akun: [], tasks: [], logSelesai: [] };
         let isEditMode = false;
@@ -439,6 +426,7 @@
             renderChecklistArea();
         }
 
+        // AMBIL DATA & TAMPILKAN DI DASHBOARD (SINKRONISASI PET)
         function renderChecklistArea() {
             const currentAccount = accountSelect.value;
             if (!currentAccount) {
@@ -454,10 +442,13 @@
             placeholderText.classList.add('hidden');
             openOAuthBtn.classList.remove('opacity-50', 'pointer-events-none'); startLauncherBtn.classList.remove('opacity-50', 'pointer-events-none');
 
+            // Ambil semua karakter yang terikat pada email aktif saat ini
             const listKarakter = dbData.akun.filter(a => a.id === currentAccount);
             if (listKarakter.length > 0) {
+                // SINKRONISASI SEARAH: Selalu ambil koleksi Pet dari index pertama [0] agar seragam satu email!
                 document.getElementById('infoPet').innerHTML = formatPetDisplayHTML(listKarakter[0].pet);
                 openOAuthBtn.href = listKarakter[0].link ? listKarakter[0].link.trim() : "#";
+                
                 document.getElementById('infoCharList').innerHTML = '';
                 listKarakter.forEach(char => {
                     document.getElementById('infoCharList').innerHTML += `
@@ -476,7 +467,6 @@
             progressCounter.innerText = `0/${dbData.tasks.length}`;
         }
 
-        // TRIGGER SIMPAN CENTANGAN ABSEN KE GOOGLE SHEETS
         async function checkAndTriggerCloudSave() {
             const currentAccount = accountSelect.value; if (!currentAccount) return;
             
@@ -510,7 +500,6 @@
             progressCounter.innerText = `0/${dbData.tasks.length}`;
         });
         
-        // TRIGGER RESET LOG CLOUD
         resetAllBtn.addEventListener('click', async () => { 
             if(confirm("Hapus total seluruh log absensi siklus hari ini di Google Sheets?")) { 
                 showNotification("Memproses hapus log cloud...");
@@ -521,24 +510,15 @@
             } 
         });
 
-        // REVISI: FUNGSI UNDO HARUS INSTAN (TANPA POP-UP CONFIRM)
         async function undoAbsenCloud(email) {
             showNotification(`Membatalkan kunci cloud untuk ${email}...`);
-            
-            // Hapus dari array lokal sementara agar UI langsung beraksi seketika
             dbData.logSelesai = dbData.logSelesai.filter(e => e !== email);
             updateUI();
             
             try {
-                await fetch(SCRIPT_URL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    body: JSON.stringify({ action: "hapusAbsenCloud", id_akun: email }) 
-                });
-                setTimeout(fetchDatabase, 1000); // Sinkronisasi ulang dengan cloud database
-            } catch (e) {
+                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "hapusAbsenCloud", id_akun: email }) });
                 setTimeout(fetchDatabase, 1000);
-            }
+            } catch (e) { setTimeout(fetchDatabase, 1000); }
         }
 
         // MANAGEMENT BADGE PET (ADMIN PANEL)
@@ -589,7 +569,7 @@
             });
         }
 
-        // TRIGGER EDIT AKUN VIA KLIK BARIS TABEL
+        // TRIGGER EDIT AKUN
         window.triggerEdit = function(index) {
             const acc = dbData.akun[index]; isEditMode = true;
             document.getElementById('id_akun').value = acc.id; document.getElementById('id_akun').disabled = true;
