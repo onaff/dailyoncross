@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Daily Checker & Admin Panel</title>
+    <title>Game Daily Control - Cloud Storage System</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .bg-gray-750 { background-color: #2d3748; }
@@ -27,7 +27,7 @@
     <!-- MAIN DASHBOARD HEADER -->
     <div class="w-full max-w-5xl bg-gray-800 p-4 rounded-xl border border-gray-700 mb-4 shadow-xl text-center">
         <h1 class="text-xl font-bold text-indigo-400 font-mono tracking-wide">🎮 GAME DAILY SYSTEM CONTROL</h1>
-        <p class="text-[11px] text-gray-400 font-mono mt-0.5">Database-Driven Multi-Account Automation Tool</p>
+        <p class="text-[11px] text-gray-400 font-mono mt-0.5">Cloud Database Synchronization Panel (No LocalStorage)</p>
     </div>
 
     <!-- MENU TAB NAVIGASI UTAMA DASHBOARD -->
@@ -87,7 +87,10 @@
                     </div>
                     <p id="placeholderText" class="text-xs text-gray-500 text-center py-10 border border-dashed border-gray-700 rounded-lg font-mono">Silakan pilih ID akun di atas untuk memulai.</p>
                 </div>
-                <div id="leftControlButtons" class="mt-4 grid grid-cols-2 gap-2 opacity-0 pointer-events-none"><button id="resetBtn" class="bg-rose-600/20 hover:bg-rose-600 text-rose-300 font-medium py-1.5 rounded text-xs">Reset Akun Ini</button><button id="resetAllBtn" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-1.5 rounded text-xs">Reset Total Harian</button></div>
+                <div id="leftControlButtons" class="mt-4 grid grid-cols-2 gap-2 opacity-0 pointer-events-none">
+                    <button id="resetBtn" class="bg-rose-600/20 hover:bg-rose-600 text-rose-300 font-medium py-1.5 rounded text-xs cursor-pointer">Kosongkan Centang</button>
+                    <button id="resetAllBtn" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium py-1.5 rounded text-xs cursor-pointer">Reset Total Cloud</button>
+                </div>
             </div>
 
             <!-- PANEL RIGHT: STATUS LOGIN -->
@@ -111,7 +114,6 @@
                         <span id="editBadge" class="hidden text-[10px] bg-amber-950 text-amber-400 border border-amber-700/50 px-2 py-0.5 rounded font-mono font-bold animate-pulse">MODE EDIT</span>
                     </div>
                     <hr class="border-gray-700 mb-3">
-                    
                     <form id="akunForm" class="space-y-3">
                         <input type="hidden" id="old_nickname">
                         <div class="grid grid-cols-2 gap-2">
@@ -161,13 +163,13 @@
                     </form>
                 </div>
                 <div class="flex gap-2 pt-4 border-t border-gray-700/60 mt-4">
-                    <button type="submit" form="akunForm" id="submitAkunBtn" class="grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded text-xs shadow">Simpan ke Google Sheets</button>
+                    <button type="submit" form="akunForm" id="submitAkunBtn" class="grow bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer">Simpan ke Google Sheets</button>
                     <button type="button" id="cancelEditBtn" class="bg-gray-700 text-gray-300 px-3 rounded text-xs cursor-pointer">Reset / Baru</button>
                 </div>
             </div>
         </div>
         
-        <!-- LIVE MONITORING EDIT DATA AKUN (AKSI DIHAPUS, KLIK BARIS AKTIF) -->
+        <!-- PANEL DATA AKUN (KLIK BARIS UNTUK EDIT) -->
         <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full">
                 <div class="flex justify-between items-center mb-3">
@@ -222,16 +224,14 @@
                                     <span class="cursor-pointer hover:bg-gray-600 rounded p-1">⚔️</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">🎁</span>
                                     <span class="cursor-pointer hover:bg-gray-600 rounded p-1">🔑</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">🐾</span>
                                     <span class="cursor-pointer hover:bg-gray-600 rounded p-1">🎟️</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">⚡</span>
-                                    <span class="cursor-pointer hover:bg-gray-600 rounded p-1">💎</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">💰</span>
-                                    <span class="cursor-pointer hover:bg-gray-600 rounded p-1">🔥</span><span class="cursor-pointer hover:bg-gray-600 rounded p-1">🌟</span>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="flex gap-2 pt-4 border-t border-gray-700/60 mt-4">
-                    <button type="submit" form="taskForm" id="submitTaskBtn" class="grow bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded text-xs shadow">🚀 Daftarkan Task Baru</button>
-                    <button type="button" id="cancelTaskEditBtn" class="hidden bg-gray-700 text-gray-300 px-3 rounded text-xs">Batal</button>
+                    <button type="submit" form="taskForm" id="submitTaskBtn" class="grow bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer">🚀 Daftarkan Task Baru</button>
+                    <button type="button" id="cancelTaskEditBtn" class="hidden bg-gray-700 text-gray-300 px-3 rounded text-xs cursor-pointer">Batal</button>
                 </div>
             </div>
         </div>
@@ -252,15 +252,16 @@
 
     <!-- SYSTEM CORE LOGIC SINGLE SCRIPT -->
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygWFut0M7pfp0rxG-9dWC5u-ufjq5TEWorDy6bckhsgD3LiWXK4SVCtH9epPSowp3nIA/exec";
+        // ⚠️ MASUKKAN SCRIPT URL HASIL DEPLOY WEB APP GOOGLE SHEETS ANDA DI BAWAH INI:
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysyh0HaA6cxx3XTDPBi3m8QTsHRI9Bs5zMVdFXVFhZBwwjLXZpLfdGz_FYo68UVRgjJw/exec";
         
-        let dbData = { akun: [], tasks: [] };
+        let dbData = { akun: [], tasks: [], logSelesai: [] };
         let isEditMode = false;
         let isTaskEditMode = false;
         let selectedPets = [];
         let toastTimeout;
 
-        // DOM TAB SELECTION ELEMENTS
+        // DOM TAB ELEMENTS
         const tabClientBtn = document.getElementById('tabClientBtn');
         const tabAkunBtn = document.getElementById('tabAkunBtn');
         const tabTasksBtn = document.getElementById('tabTasksBtn');
@@ -268,7 +269,7 @@
         const panelAkun = document.getElementById('panelAkun');
         const panelTasks = document.getElementById('panelTasks');
 
-        // DASHBOARD CLIENT ELEMENT DOM
+        // DASHBOARD CLIENT DOM
         const accountSelect = document.getElementById('accountSelect');
         const accountInfoBar = document.getElementById('accountInfoBar');
         const openOAuthBtn = document.getElementById('openOAuthBtn');
@@ -285,7 +286,7 @@
         const resetAllBtn = document.getElementById('resetAllBtn');
         const checkAllBtn = document.getElementById('checkAllBtn');
 
-        // ADMIN TAB FORM COMPONENT DOM
+        // ADMIN FORMS DOM
         const petBadgeContainer = document.getElementById('petBadgeContainer');
         const petPlaceholder = document.getElementById('petPlaceholder');
         const petInput = document.getElementById('petInput');
@@ -293,44 +294,19 @@
         const isMythicCheck = document.getElementById('isMythicCheck');
         const petSuggestions = document.getElementById('petSuggestions');
 
-        // LOGIKA RESET OTOMATIS JAM 05:00 PAGI
-        function checkDailyResetTime() {
-            const now = new Date();
-            const resetTarget = new Date();
-            resetTarget.setHours(5, 0, 0, 0);
-            
-            let currentDayIdentifier = "";
-            if (now >= resetTarget) {
-                currentDayIdentifier = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
-            } else {
-                const yesterday = new Date(now);
-                yesterday.setDate(now.getDate() - 1);
-                currentDayIdentifier = yesterday.getFullYear() + "-" + (yesterday.getMonth() + 1) + "-" + yesterday.getDate();
-            }
-            
-            const lastSavedCycle = localStorage.getItem('game_absensi_cycle_date');
-            if (lastSavedCycle !== currentDayIdentifier) {
-                localStorage.removeItem('game_absensi_data');
-                localStorage.setItem('game_absensi_cycle_date', currentDayIdentifier);
-                showNotification("Siklus Baru Dimulai! Progress absen otomatis direset.");
-            }
-        }
-
-        // SWITCHING LOGIC TAB SYSTEM
+        // NAVIGATION SWITCHING SYSTEM
         tabClientBtn.addEventListener('click', () => {
             tabClientBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg bg-indigo-600 text-white shadow-lg cursor-pointer";
             tabAkunBtn.className = tabTasksBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-700/50 cursor-pointer";
             panelClient.classList.remove('hidden'); panelAkun.classList.add('hidden'); panelTasks.classList.add('hidden');
             exitEditMode(); exitTaskEditMode();
         });
-
         tabAkunBtn.addEventListener('click', () => {
             tabAkunBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg bg-indigo-600 text-white shadow-lg cursor-pointer";
             tabClientBtn.className = tabTasksBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-700/50 cursor-pointer";
             panelAkun.classList.remove('hidden'); panelClient.classList.add('hidden'); panelTasks.classList.add('hidden');
             exitTaskEditMode();
         });
-
         tabTasksBtn.addEventListener('click', () => {
             tabTasksBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg bg-emerald-600 text-white shadow-lg cursor-pointer";
             tabClientBtn.className = tabAkunBtn.className = "flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-700/50 cursor-pointer";
@@ -354,9 +330,12 @@
             toastTimeout = setTimeout(() => { toast.className = "fixed top-4 left-1/2 -translate-x-1/2 z-50 transform opacity-0 pointer-events-none max-w-md w-full px-4 transition-all duration-300"; }, 3000);
         }
 
+        // LOAD DATA UTAMA DARI CLOUD
         async function fetchDatabase() {
             try {
-                checkDailyResetTime();
+                if(SCRIPT_URL === "MASUKKAN_URL_DEPLOYMENT_BARU_DISINI") {
+                    showNotification("Silakan isi SCRIPT_URL terlebih dahulu!", "error"); return;
+                }
                 const cacheBuster = new Date().getTime();
                 const response = await fetch(`${SCRIPT_URL}?_=${cacheBuster}`);
                 dbData = await response.json();
@@ -388,14 +367,11 @@
         function formatPetDisplayHTML(petString) {
             if(!petString || petString === "-") return "-";
             return petString.split(', ').map(pet => {
-                if(pet.startsWith('⭐')) {
-                    return `<span class="text-amber-400 font-bold bg-amber-950/40 px-1 py-0.5 rounded border border-amber-600/30">${pet}</span>`;
-                }
+                if(pet.startsWith('⭐')) return `<span class="text-amber-400 font-bold bg-amber-950/40 px-1 py-0.5 rounded border border-amber-600/30">${pet}</span>`;
                 return `<span>${pet}</span>`;
             }).join(' <span class="text-gray-600 font-bold mx-0.5">|</span> ');
         }
 
-        // REVISI: RENDER DATA AKUN (AKSI DIHAPUS, BERUBAH JADI CLICKABLE ROW)
         function renderAdminAkunTable() {
             const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = '';
             dbData.akun.forEach((acc, idx) => {
@@ -412,18 +388,13 @@
 
         function renderAdminTaskTable() {
             const tbody = document.getElementById('taskTableBody'); tbody.innerHTML = '';
-            if(dbData.tasks.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-gray-500">Belum ada task harian.</td></tr>'; return;
-            }
             dbData.tasks.forEach((task, idx) => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-700/40 transition-colors">
                         <td class="p-2 text-center text-base">${task.emoji}</td>
                         <td class="p-2 font-mono text-amber-400 font-semibold truncate">${task.id}</td>
                         <td class="p-2 text-gray-200 font-medium truncate">${task.nama}</td>
-                        <td class="p-2 text-center">
-                            <button onclick="triggerTaskEdit(${idx})" class="bg-amber-600/20 hover:bg-amber-600 text-amber-400 hover:text-white px-2 py-0.5 rounded text-[11px] cursor-pointer">✏️ Edit</button>
-                        </td>
+                        <td class="p-2 text-center"><button onclick="triggerTaskEdit(${idx})" class="bg-amber-600/20 text-amber-400 px-2 py-0.5 rounded text-[11px] cursor-pointer">✏️ Edit</button></td>
                     </tr>
                 `;
             });
@@ -431,12 +402,11 @@
 
         function initCheckboxListeners() {
             document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb => {
-                cb.addEventListener('change', (e) => { updateTextStyle(e.target); saveProgress(); });
+                cb.addEventListener('change', (e) => { updateTextStyle(e.target); checkAndTriggerCloudSave(); });
             });
         }
 
         function updateUI() {
-            const savedData = JSON.parse(localStorage.getItem('game_absensi_data')) || {};
             const selectedBefore = accountSelect.value;
             const validAccounts = dbData.akun.filter(acc => acc && acc.id && acc.id.trim() !== "");
             const uniqueEmails = [...new Set(validAccounts.map(acc => acc.id.trim()))];
@@ -446,16 +416,16 @@
 
             let doneCount = 0;
             uniqueEmails.forEach(email => {
-                const accountData = savedData[email] || {};
-                let checkedCount = 0;
-                dbData.tasks.forEach(t => { if (accountData[t.id]) checkedCount++; });
+                let isSelesaiDiSheets = dbData.logSelesai.includes(email);
 
-                if (dbData.tasks.length > 0 && checkedCount === dbData.tasks.length) {
+                if (isSelesaiDiSheets) {
                     doneCount++;
                     completedList.innerHTML += `
                         <li class="flex items-center justify-between p-1.5 bg-gray-900/50 rounded border border-gray-700 text-xs">
-                            <span class="text-gray-400 truncate font-mono">✅ ${email}</span>
-                            <button onclick="undoAccount('${email}')" class="text-gray-500 hover:text-indigo-400 ml-1 cursor-pointer">↩️</button>
+                            <span class="text-emerald-400 truncate font-mono">☁️ ✅ ${email}</span>
+                            <button onclick="undoAbsenCloud('${email}')" class="text-[11px] bg-gray-750 hover:bg-rose-950 border border-gray-700 hover:border-rose-500 text-gray-400 hover:text-rose-400 px-2 py-0.5 rounded cursor-pointer transition-all font-mono" title="Membatalkan Lock Cloud">
+                                ↩️ UNDO
+                            </button>
                         </li>
                     `;
                 } else {
@@ -500,48 +470,78 @@
                 accountInfoBar.classList.remove('hidden');
             }
 
-            const savedData = JSON.parse(localStorage.getItem('game_absensi_data')) || {};
-            const accountData = savedData[currentAccount] || {};
-            let currentChecked = 0;
-            
             document.querySelectorAll('#todoList input[type="checkbox"]').forEach(checkbox => {
-                const isChecked = accountData[checkbox.getAttribute('data-task')] || false;
-                checkbox.checked = isChecked;
-                if(isChecked) currentChecked++;
-                updateTextStyle(checkbox);
+                checkbox.checked = false; updateTextStyle(checkbox);
             });
-            progressCounter.innerText = `${currentChecked}/${dbData.tasks.length}`;
+            progressCounter.innerText = `0/${dbData.tasks.length}`;
         }
 
-        function saveProgress() {
+        // TRIGGER SIMPAN CENTANGAN ABSEN KE GOOGLE SHEETS
+        async function checkAndTriggerCloudSave() {
             const currentAccount = accountSelect.value; if (!currentAccount) return;
-            const savedData = JSON.parse(localStorage.getItem('game_absensi_data')) || {};
-            if (!savedData[currentAccount]) savedData[currentAccount] = {};
-            document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb => { savedData[currentAccount][cb.getAttribute('data-task')] = cb.checked; });
-            localStorage.setItem('game_absensi_data', JSON.stringify(savedData));
-            updateUI();
+            
+            const checkboxes = document.querySelectorAll('#todoList input[type="checkbox"]');
+            let totalChecked = 0;
+            checkboxes.forEach(cb => { if(cb.checked) totalChecked++; });
+            progressCounter.innerText = `${totalChecked}/${dbData.tasks.length}`;
+            
+            if (totalChecked === dbData.tasks.length) {
+                showNotification(`Mengunci Akun ${currentAccount} ke Cloud...`);
+                dbData.logSelesai.push(currentAccount);
+                updateUI();
+                
+                try {
+                    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "simpanAbsenCloud", id_akun: currentAccount }) });
+                    setTimeout(fetchDatabase, 1000);
+                } catch (e) { setTimeout(fetchDatabase, 1000); }
+            }
         }
 
         function updateTextStyle(cb) { cb.checked ? cb.nextElementSibling.classList.add('line-through', 'text-gray-500') : cb.nextElementSibling.classList.remove('line-through', 'text-gray-500'); }
-        window.undoAccount = function(id) {
-            const savedData = JSON.parse(localStorage.getItem('game_absensi_data')) || {};
-            if (savedData[id] && dbData.tasks.length > 0) {
-                savedData[id][dbData.tasks[dbData.tasks.length - 1].id] = false;
-                localStorage.setItem('game_absensi_data', JSON.stringify(savedData));
-                updateUI(); accountSelect.value = id; renderChecklistArea();
-            }
-        }
 
         checkAllBtn.addEventListener('click', () => {
             if (!accountSelect.value) return;
             document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb => { cb.checked = true; updateTextStyle(cb); });
-            saveProgress();
+            checkAndTriggerCloudSave();
         });
         accountSelect.addEventListener('change', renderChecklistArea);
-        resetBtn.addEventListener('click', () => { if(confirm("Reset akun ini?")) { document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb => cb.checked = false); saveProgress(); } });
-        resetAllBtn.addEventListener('click', () => { if(confirm("Hapus semua progress?")) { localStorage.removeItem('game_absensi_data'); updateUI(); } });
+        resetBtn.addEventListener('click', () => { 
+            document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb => { cb.checked = false; updateTextStyle(cb); }); 
+            progressCounter.innerText = `0/${dbData.tasks.length}`;
+        });
+        
+        // TRIGGER RESET LOG CLOUD
+        resetAllBtn.addEventListener('click', async () => { 
+            if(confirm("Hapus total seluruh log absensi siklus hari ini di Google Sheets?")) { 
+                showNotification("Memproses hapus log cloud...");
+                try {
+                    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "resetTotalCloud" }) });
+                    setTimeout(fetchDatabase, 1500);
+                } catch (e) { setTimeout(fetchDatabase, 1500); }
+            } 
+        });
 
-        // ADMIN INTERACTION LOGIC (AKUN)
+        // REVISI: FUNGSI UNDO HARUS INSTAN (TANPA POP-UP CONFIRM)
+        async function undoAbsenCloud(email) {
+            showNotification(`Membatalkan kunci cloud untuk ${email}...`);
+            
+            // Hapus dari array lokal sementara agar UI langsung beraksi seketika
+            dbData.logSelesai = dbData.logSelesai.filter(e => e !== email);
+            updateUI();
+            
+            try {
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    body: JSON.stringify({ action: "hapusAbsenCloud", id_akun: email }) 
+                });
+                setTimeout(fetchDatabase, 1000); // Sinkronisasi ulang dengan cloud database
+            } catch (e) {
+                setTimeout(fetchDatabase, 1000);
+            }
+        }
+
+        // MANAGEMENT BADGE PET (ADMIN PANEL)
         function renderPetBadges() {
             petBadgeContainer.innerHTML = '';
             if (selectedPets.length === 0) { petBadgeContainer.appendChild(petPlaceholder); return; }
@@ -589,7 +589,7 @@
             });
         }
 
-        // AKAN TERPANGGIL SAAT BARIS TABEL DIKLIK
+        // TRIGGER EDIT AKUN VIA KLIK BARIS TABEL
         window.triggerEdit = function(index) {
             const acc = dbData.akun[index]; isEditMode = true;
             document.getElementById('id_akun').value = acc.id; document.getElementById('id_akun').disabled = true;
@@ -616,7 +616,7 @@
             try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); setTimeout(fetchDatabase, 1500); } catch (err) { setTimeout(fetchDatabase, 1500); }
         });
 
-        // ADMIN INTERACTION LOGIC (TASK EDIT)
+        // MANAGEMENT DATA TASK HARIAN (ADMIN)
         const emojiInput = document.getElementById('emoji'); const emojiPicker = document.getElementById('emojiPicker');
         emojiInput.addEventListener('click', (e) => { e.stopPropagation(); emojiPicker.classList.toggle('hidden'); });
         emojiPicker.querySelectorAll('span').forEach(s => s.addEventListener('click', () => { emojiInput.value = s.innerText; emojiPicker.classList.add('hidden'); }));
@@ -627,7 +627,7 @@
             document.getElementById('id_task').value = t.id; document.getElementById('id_task').disabled = true;
             document.getElementById('nama_task').value = t.nama; document.getElementById('emoji').value = t.emoji;
             document.getElementById('taskFormTitle').innerText = "✏️ Edit Tugas Harian";
-            document.getElementById('submitTaskBtn').innerText = "Update Data Task"; document.getElementById('submitTaskBtn').className = "grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer";
+            document.getElementById('submitTaskBtn').innerText = "Update Data Task"; document.getElementById('submitTaskBtn').className = "grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded text-xs shadow pointer-events-auto cursor-pointer";
             document.getElementById('taskEditBadge').classList.remove('hidden'); document.getElementById('cancelTaskEditBtn').classList.remove('hidden');
         }
         function exitTaskEditMode() {
