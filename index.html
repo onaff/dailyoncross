@@ -17,17 +17,20 @@
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-3 text-sm relative">
 
+    <!-- TOP GLOBAL NOTIFICATION TOAST -->
     <div id="globalToast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 transform opacity-0 pointer-events-none transition-all duration-300 max-w-md w-full px-4">
         <div id="toastContent" class="flex items-center gap-2 bg-gray-800 border px-4 py-2.5 rounded-lg shadow-2xl font-mono text-xs font-bold text-center justify-center">
             <span id="toastIcon"></span><span id="toastMessage"></span>
         </div>
     </div>
 
+    <!-- MAIN DASHBOARD HEADER -->
     <div class="w-full max-w-5xl bg-gray-800 p-4 rounded-xl border border-gray-700 mb-4 shadow-xl text-center">
         <h1 class="text-xl font-bold text-indigo-400 font-mono tracking-wide">🎮 GAME DAILY SYSTEM CONTROL</h1>
         <p class="text-[11px] text-gray-400 font-mono mt-0.5">Relational Cloud Tab Database (Sheet Akun & Sheet DataPet Terpisah)</p>
     </div>
 
+    <!-- MENU TAB NAVIGASI UTAMA DASHBOARD -->
     <div class="w-full max-w-5xl flex bg-gray-800 p-1.5 rounded-xl border border-gray-700 mb-4 gap-2 shadow-md">
         <button id="tabClientBtn" class="flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg transition-all cursor-pointer bg-indigo-600 text-white shadow-lg">
             📱 DASHBOARD ABSEN
@@ -40,6 +43,7 @@
         </button>
     </div>
 
+    <!-- PANEL 1: DASHBOARD CLIENT -->
     <div id="panelClient" class="w-full max-w-5xl space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full items-stretch">
             <div class="md:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between min-h-[305px]">
@@ -51,13 +55,19 @@
                         </select>
                     </div>
 
+                    <!-- STATUS BAR UTAMA (MODIFIKASI: Ditambahkan Box Catatan Akun) -->
                     <div id="accountInfoBar" class="hidden bg-gray-900/60 p-3 rounded-lg border border-gray-700/50 mb-3 text-[11px] text-gray-300 font-mono space-y-2.5">
                         <div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">👤 Daftar Karakter Di Dalam Akun:</div>
-                            <div id="infoCharList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-[60px] overflow-y-auto pr-1"></div>
+                            <div id="infoCharList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-[70px] overflow-y-auto pr-1"></div>
                         </div>
                         <div class="truncate border-t border-gray-800 pt-1.5 text-emerald-400 font-bold">
                             🐾 Koleksi Pet Akun: <span id="infoPet" class="text-gray-300 font-normal flex flex-wrap gap-x-1.5 items-center mt-1">-</span>
+                        </div>
+                        <!-- BOX CATATAN AKUN KHUSUS JOKI -->
+                        <div id="infoCatatanBlock" class="border-t border-gray-800 pt-1.5 text-amber-400 font-bold hidden">
+                            📌 Catatan Penting Karakter: 
+                            <div id="infoCatatanText" class="text-gray-300 font-normal bg-amber-950/20 border border-amber-900/30 p-1.5 rounded mt-1 whitespace-pre-wrap leading-relaxed"></div>
                         </div>
                     </div>
 
@@ -95,6 +105,7 @@
         </div>
     </div>
 
+    <!-- PANEL 2: MANAJEMEN DATA AKUN (FORM INPUT CATATAN) -->
     <div id="panelAkun" class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch hidden">
         <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full justify-between">
@@ -134,6 +145,13 @@
                                 <input type="number" id="level" required placeholder="60" class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-white text-xs font-mono text-center">
                             </div>
                         </div>
+                        
+                        <!-- MODIFIKASI: INPUTAN CATATAN BARU -->
+                        <div>
+                            <label class="block text-[11px] text-gray-400 mb-1">Catatan Tambahan Karakter (Progress/Evo Pet/Bahan):</label>
+                            <textarea id="catatan" placeholder="Contoh: Evo pet kurang bahan, lvl dikit lagi naik, dll..." rows="2" class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500"></textarea>
+                        </div>
+
                         <div>
                             <label class="block text-[11px] text-gray-400 mb-1 flex justify-between items-center">
                                 <span>Daftar Koleksi Pet Akun:</span>
@@ -182,6 +200,7 @@
         </div>
     </div>
 
+    <!-- PANEL 3: MANAJEMEN TASK GAME -->
     <div id="panelTasks" class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch hidden">
         <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full justify-between">
@@ -238,9 +257,10 @@
         </div>
     </div>
 
+    <!-- SYSTEM CORE LOGIC SINGLE SCRIPT -->
     <script>
         // ⚠️ PASTE URL WEB APP APPS SCRIPT ANDA DI BAWAH INI:
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyyrLaUPpr72QyWH7kbSsyx7orzlVqFkQ1QCJKwK2RPOmFJ_K3kPwijgiJPYOICijkiJA/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhZJkK8HluniftPMlWbpUtelpU_yYhs6bS9Ue0YjrlksJLp_SetbNF57t7fVFqQz4sGw/exec";
         
         let dbData = { akun: [], tasks: [], logSelesai: [] };
         let isEditMode = false;
@@ -425,6 +445,7 @@
             renderChecklistArea();
         }
 
+        // TAMPILKAN DATA (MODIFIKASI: Ditambahkan render list catatan)
         function renderChecklistArea() {
             const currentAccount = accountSelect.value;
             if (!currentAccount) {
@@ -445,7 +466,10 @@
                 document.getElementById('infoPet').innerHTML = formatPetDisplayHTML(listKarakter[0].pet);
                 openOAuthBtn.href = listKarakter[0].link ? listKarakter[0].link.trim() : "#";
                 
+                // MENGGABUNGKAN DAN MENAMPILKAN CATATAN KARAKTER JIKA ADA
+                let gabunganCatatan = [];
                 document.getElementById('infoCharList').innerHTML = '';
+                
                 listKarakter.forEach(char => {
                     document.getElementById('infoCharList').innerHTML += `
                         <div class="bg-gray-850 p-1 rounded border border-gray-800 text-[10px] truncate flex justify-between items-center">
@@ -453,7 +477,20 @@
                             <span class="text-gray-400 text-[9px] shrink-0 ml-1">(${char.karakter} Lvl.${char.level})</span>
                         </div>
                     `;
+                    if(char.catatan && char.catatan !== "-") {
+                        gabunganCatatan.push(`• [${char.nickname}]: ${char.catatan}`);
+                    }
                 });
+
+                // Munculkan block catatan jika ada isinya
+                const catatanBlock = document.getElementById('infoCatatanBlock');
+                if(gabunganCatatan.length > 0) {
+                    document.getElementById('infoCatatanText').innerText = gabunganCatatan.join('\n');
+                    catatanBlock.classList.remove('hidden');
+                } else {
+                    catatanBlock.classList.add('hidden');
+                }
+
                 accountInfoBar.classList.remove('hidden');
             }
 
@@ -564,12 +601,16 @@
             });
         }
 
+        // TRIGGER EDIT AKUN (MODIFIKASI: Ditambahkan pembacaan kolom catatan)
         window.triggerEdit = function(index) {
             const acc = dbData.akun[index]; isEditMode = true;
             document.getElementById('id_akun').value = acc.id; document.getElementById('id_akun').disabled = true;
             document.getElementById('server').value = acc.server; document.getElementById('karakter').value = acc.karakter;
             document.getElementById('nickname').value = acc.nickname; document.getElementById('old_nickname').value = acc.nickname;
-            document.getElementById('level').value = acc.level; selectedPets = (acc.pet && acc.pet !== "-") ? acc.pet.split(', ').filter(Boolean) : [];
+            document.getElementById('level').value = acc.level; 
+            document.getElementById('catatan').value = (acc.catatan && acc.catatan !== "-") ? acc.catatan : ""; // Set field catatan
+            
+            selectedPets = (acc.pet && acc.pet !== "-") ? acc.pet.split(', ').filter(Boolean) : [];
             renderPetBadges(); document.getElementById('formTitle').innerText = "✏️ Edit Data Akun";
             document.getElementById('submitAkunBtn').innerText = "Update Data Akun"; document.getElementById('submitAkunBtn').className = "grow bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 rounded text-xs shadow cursor-pointer transition-colors";
             document.getElementById('editBadge').classList.remove('hidden');
@@ -585,7 +626,18 @@
 
         document.getElementById('akunForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const payload = { action: isEditMode ? "updateAkun" : "addAkun", id_akun: document.getElementById('id_akun').value.trim(), server: document.getElementById('server').value.trim(), karakter: document.getElementById('karakter').value, nickname: document.getElementById('nickname').value.trim(), old_nickname: document.getElementById('old_nickname').value.trim(), level: document.getElementById('level').value.trim(), pet: selectedPets.length > 0 ? selectedPets.join(', ') : "-" };
+            // MODIFIKASI: Menambahkan data catatan ke payload
+            const payload = { 
+                action: isEditMode ? "updateAkun" : "addAkun", 
+                id_akun: document.getElementById('id_akun').value.trim(), 
+                server: document.getElementById('server').value.trim(), 
+                karakter: document.getElementById('karakter').value, 
+                nickname: document.getElementById('nickname').value.trim(), 
+                old_nickname: document.getElementById('old_nickname').value.trim(), 
+                level: document.getElementById('level').value.trim(), 
+                catatan: document.getElementById('catatan').value.trim() || "-",
+                pet: selectedPets.length > 0 ? selectedPets.join(', ') : "-" 
+            };
             showNotification("Memproses ke cloud database..."); exitEditMode();
             try { await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) }); setTimeout(fetchDatabase, 1500); } catch (err) { setTimeout(fetchDatabase, 1500); }
         });
