@@ -55,7 +55,6 @@
                         </select>
                     </div>
 
-                    <!-- STATUS BAR UTAMA (MODIFIKASI: Ditambahkan Box Catatan Akun) -->
                     <div id="accountInfoBar" class="hidden bg-gray-900/60 p-3 rounded-lg border border-gray-700/50 mb-3 text-[11px] text-gray-300 font-mono space-y-2.5">
                         <div>
                             <div class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">👤 Daftar Karakter Di Dalam Akun:</div>
@@ -64,7 +63,6 @@
                         <div class="truncate border-t border-gray-800 pt-1.5 text-emerald-400 font-bold">
                             🐾 Koleksi Pet Akun: <span id="infoPet" class="text-gray-300 font-normal flex flex-wrap gap-x-1.5 items-center mt-1">-</span>
                         </div>
-                        <!-- BOX CATATAN AKUN KHUSUS JOKI -->
                         <div id="infoCatatanBlock" class="border-t border-gray-800 pt-1.5 text-amber-400 font-bold hidden">
                             📌 Catatan Penting Karakter: 
                             <div id="infoCatatanText" class="text-gray-300 font-normal bg-amber-950/20 border border-amber-900/30 p-1.5 rounded mt-1 whitespace-pre-wrap leading-relaxed"></div>
@@ -105,7 +103,7 @@
         </div>
     </div>
 
-    <!-- PANEL 2: MANAJEMEN DATA AKUN (FORM INPUT CATATAN) -->
+    <!-- PANEL 2: MANAJEMEN DATA AKUN -->
     <div id="panelAkun" class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch hidden">
         <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full justify-between">
@@ -145,13 +143,10 @@
                                 <input type="number" id="level" required placeholder="60" class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-white text-xs font-mono text-center">
                             </div>
                         </div>
-                        
-                        <!-- MODIFIKASI: INPUTAN CATATAN BARU -->
                         <div>
                             <label class="block text-[11px] text-gray-400 mb-1">Catatan Tambahan Karakter (Progress/Evo Pet/Bahan):</label>
                             <textarea id="catatan" placeholder="Contoh: Evo pet kurang bahan, lvl dikit lagi naik, dll..." rows="2" class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500"></textarea>
                         </div>
-
                         <div>
                             <label class="block text-[11px] text-gray-400 mb-1 flex justify-between items-center">
                                 <span>Daftar Koleksi Pet Akun:</span>
@@ -177,6 +172,7 @@
             </div>
         </div>
         
+        <!-- PANEL DATA AKUN (REVISI: STRUKTUR STRIP COLUMNS DIUBAH) -->
         <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full">
                 <div class="flex justify-between items-center mb-3">
@@ -188,8 +184,8 @@
                         <thead class="sticky top-0 bg-gray-900 text-gray-400 font-mono border-b border-gray-700 text-[11px] z-10">
                             <tr>
                                 <th class="p-2.5 w-1/3">ID / Email</th>
-                                <th class="p-2.5 w-1/5">Job</th>
-                                <th class="p-2.5 w-1/4">Nickname</th>
+                                <th class="p-2.5 w-1/4">Nickname</th> <!-- Dipindah ke Kolom 2 -->
+                                <th class="p-2.5 w-1/5">Job</th>      <!-- Dipindah ke Kolom 3 -->
                                 <th class="p-2.5 w-1/7 text-center">Lvl</th>
                             </tr>
                         </thead>
@@ -260,7 +256,7 @@
     <!-- SYSTEM CORE LOGIC SINGLE SCRIPT -->
     <script>
         // ⚠️ PASTE URL WEB APP APPS SCRIPT ANDA DI BAWAH INI:
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhZJkK8HluniftPMlWbpUtelpU_yYhs6bS9Ue0YjrlksJLp_SetbNF57t7fVFqQz4sGw/exec";
+        const SCRIPT_URL = "MASUKKAN_URL_DEPLOYMENT_BARU_DISINI";
         
         let dbData = { akun: [], tasks: [], logSelesai: [] };
         let isEditMode = false;
@@ -378,14 +374,15 @@
             }).join(' <span class="text-gray-600 font-bold mx-0.5">|</span> ');
         }
 
+        // REVISI: URUTAN DATA CELL DIUBAH (EMAIL -> NICKNAME -> JOB -> LVL)
         function renderAdminAkunTable() {
             const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = '';
             dbData.akun.forEach((acc, idx) => {
                 tbody.innerHTML += `
                     <tr onclick="triggerEdit(${idx})" class="hover:bg-indigo-900/30 border-b border-gray-700/40 transition-colors cursor-pointer group">
                         <td class="p-2.5 font-mono text-gray-200 truncate group-hover:text-indigo-300" title="${acc.id}">${acc.id}</td>
-                        <td class="p-2.5 text-indigo-300 font-semibold truncate">${acc.karakter}</td>
-                        <td class="p-2.5 text-sky-300 font-semibold truncate">${acc.nickname}</td>
+                        <td class="p-2.5 text-sky-300 font-semibold truncate">${acc.nickname}</td> <!-- Kolom 2: Nickname -->
+                        <td class="p-2.5 text-indigo-300 font-semibold truncate">${acc.karakter}</td> <!-- Kolom 3: Job -->
                         <td class="p-2.5 text-amber-400 font-bold text-center">${acc.level}</td>
                     </tr>
                 `;
@@ -445,7 +442,6 @@
             renderChecklistArea();
         }
 
-        // TAMPILKAN DATA (MODIFIKASI: Ditambahkan render list catatan)
         function renderChecklistArea() {
             const currentAccount = accountSelect.value;
             if (!currentAccount) {
@@ -466,7 +462,6 @@
                 document.getElementById('infoPet').innerHTML = formatPetDisplayHTML(listKarakter[0].pet);
                 openOAuthBtn.href = listKarakter[0].link ? listKarakter[0].link.trim() : "#";
                 
-                // MENGGABUNGKAN DAN MENAMPILKAN CATATAN KARAKTER JIKA ADA
                 let gabunganCatatan = [];
                 document.getElementById('infoCharList').innerHTML = '';
                 
@@ -482,7 +477,6 @@
                     }
                 });
 
-                // Munculkan block catatan jika ada isinya
                 const catatanBlock = document.getElementById('infoCatatanBlock');
                 if(gabunganCatatan.length > 0) {
                     document.getElementById('infoCatatanText').innerText = gabunganCatatan.join('\n');
@@ -601,14 +595,13 @@
             });
         }
 
-        // TRIGGER EDIT AKUN (MODIFIKASI: Ditambahkan pembacaan kolom catatan)
         window.triggerEdit = function(index) {
             const acc = dbData.akun[index]; isEditMode = true;
             document.getElementById('id_akun').value = acc.id; document.getElementById('id_akun').disabled = true;
             document.getElementById('server').value = acc.server; document.getElementById('karakter').value = acc.karakter;
             document.getElementById('nickname').value = acc.nickname; document.getElementById('old_nickname').value = acc.nickname;
             document.getElementById('level').value = acc.level; 
-            document.getElementById('catatan').value = (acc.catatan && acc.catatan !== "-") ? acc.catatan : ""; // Set field catatan
+            document.getElementById('catatan').value = (acc.catatan && acc.catatan !== "-") ? acc.catatan : "";
             
             selectedPets = (acc.pet && acc.pet !== "-") ? acc.pet.split(', ').filter(Boolean) : [];
             renderPetBadges(); document.getElementById('formTitle').innerText = "✏️ Edit Data Akun";
@@ -626,7 +619,6 @@
 
         document.getElementById('akunForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // MODIFIKASI: Menambahkan data catatan ke payload
             const payload = { 
                 action: isEditMode ? "updateAkun" : "addAkun", 
                 id_akun: document.getElementById('id_akun').value.trim(), 
