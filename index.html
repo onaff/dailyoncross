@@ -17,20 +17,17 @@
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-3 text-sm relative">
 
-    <!-- TOP GLOBAL NOTIFICATION TOAST -->
     <div id="globalToast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 transform opacity-0 pointer-events-none transition-all duration-300 max-w-md w-full px-4">
         <div id="toastContent" class="flex items-center gap-2 bg-gray-800 border px-4 py-2.5 rounded-lg shadow-2xl font-mono text-xs font-bold text-center justify-center">
             <span id="toastIcon"></span><span id="toastMessage"></span>
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD HEADER -->
     <div class="w-full max-w-5xl bg-gray-800 p-4 rounded-xl border border-gray-700 mb-4 shadow-xl text-center">
         <h1 class="text-xl font-bold text-indigo-400 font-mono tracking-wide">🎮 GAME DAILY SYSTEM CONTROL</h1>
         <p class="text-[11px] text-gray-400 font-mono mt-0.5">Relational Cloud Tab Database (Sheet Akun & Sheet DataPet Terpisah)</p>
     </div>
 
-    <!-- MENU TAB NAVIGASI UTAMA DASHBOARD -->
     <div class="w-full max-w-5xl flex bg-gray-800 p-1.5 rounded-xl border border-gray-700 mb-4 gap-2 shadow-md">
         <button id="tabClientBtn" class="flex-1 py-2.5 text-center text-xs font-mono font-bold rounded-lg transition-all cursor-pointer bg-indigo-600 text-white shadow-lg">
             📱 DASHBOARD ABSEN
@@ -43,7 +40,6 @@
         </button>
     </div>
 
-    <!-- PANEL 1: DASHBOARD CLIENT -->
     <div id="panelClient" class="w-full max-w-5xl space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full items-stretch">
             <div class="md:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between min-h-[305px]">
@@ -57,8 +53,8 @@
 
                     <div id="accountInfoBar" class="hidden bg-gray-900/60 p-3 rounded-lg border border-gray-700/50 mb-3 text-[11px] text-gray-300 font-mono space-y-2.5">
                         <div>
-                            <div class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">👤 Daftar Karakter Di Dalam Akun:</div>
-                            <div id="infoCharList" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-[70px] overflow-y-auto pr-1"></div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1.5">👤 Daftar Karakter Di Dalam Akun:</div>
+                            <div id="infoCharList" class="flex flex-col gap-1.5 max-h-[120px] overflow-y-auto pr-1"></div>
                         </div>
                         <div class="truncate border-t border-gray-800 pt-1.5 text-emerald-400 font-bold">
                             🐾 Koleksi Pet Akun: <span id="infoPet" class="text-gray-300 font-normal flex flex-wrap gap-x-1.5 items-center mt-1">-</span>
@@ -103,7 +99,6 @@
         </div>
     </div>
 
-    <!-- PANEL 2: MANAJEMEN DATA AKUN -->
     <div id="panelAkun" class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch hidden">
         <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full justify-between">
@@ -144,7 +139,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[11px] text-gray-400 mb-1">Catatan Tambahan Karakter (Progress/Evo Pet/Bahan):</label>
+                            <label class="block text-[11px] text-gray-400 mb-1">Catatan Tambahan Karakter:</label>
                             <textarea id="catatan" placeholder="Contoh: Evo pet kurang bahan, lvl dikit lagi naik, dll..." rows="2" class="w-full bg-gray-700 border border-gray-600 rounded px-2.5 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500"></textarea>
                         </div>
                         <div>
@@ -172,7 +167,6 @@
             </div>
         </div>
         
-        <!-- PANEL DATA AKUN (REVISI: STRUKTUR STRIP COLUMNS DIUBAH) -->
         <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full">
                 <div class="flex justify-between items-center mb-3">
@@ -184,8 +178,8 @@
                         <thead class="sticky top-0 bg-gray-900 text-gray-400 font-mono border-b border-gray-700 text-[11px] z-10">
                             <tr>
                                 <th class="p-2.5 w-1/3">ID / Email</th>
-                                <th class="p-2.5 w-1/4">Nickname</th> <!-- Dipindah ke Kolom 2 -->
-                                <th class="p-2.5 w-1/5">Job</th>      <!-- Dipindah ke Kolom 3 -->
+                                <th class="p-2.5 w-1/4">Nickname</th>
+                                <th class="p-2.5 w-1/5">Job</th>
                                 <th class="p-2.5 w-1/7 text-center">Lvl</th>
                             </tr>
                         </thead>
@@ -196,7 +190,6 @@
         </div>
     </div>
 
-    <!-- PANEL 3: MANAJEMEN TASK GAME -->
     <div id="panelTasks" class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-4 items-stretch hidden">
         <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full justify-between">
@@ -241,7 +234,7 @@
         <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl shadow-xl border border-gray-700 flex flex-col justify-between h-full">
             <div class="flex flex-col h-full">
                 <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3 font-mono">🛠️ PANEL EDIT TASK HARIAN</h3>
-                <div class="overflow-x-auto rounded-lg border border-gray-700 grow overflow-y-auto min-h-[330px] max-h-[370px]">
+                <div class="overflow-x-auto rounded-lg border border-gray-700 grow overflow-y-auto min-h-[330px] Max-h-[370px]">
                     <table class="w-full text-left border-collapse text-xs table-fixed">
                         <thead class="sticky top-0 bg-gray-900 text-gray-400 font-mono border-b border-gray-700 text-[11px] z-10">
                             <tr><th class="p-2 w-1/5 text-center">Ikon</th><th class="p-2 w-1/3">ID Kode</th><th class="p-2 w-1/3">Nama Tugas</th><th class="p-2 w-1/5 text-center">Aksi</th></tr>
@@ -253,7 +246,6 @@
         </div>
     </div>
 
-    <!-- SYSTEM CORE LOGIC SINGLE SCRIPT -->
     <script>
         // ⚠️ PASTE URL WEB APP APPS SCRIPT ANDA DI BAWAH INI:
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhZJkK8HluniftPMlWbpUtelpU_yYhs6bS9Ue0YjrlksJLp_SetbNF57t7fVFqQz4sGw/exec";
@@ -374,15 +366,14 @@
             }).join(' <span class="text-gray-600 font-bold mx-0.5">|</span> ');
         }
 
-        // REVISI: URUTAN DATA CELL DIUBAH (EMAIL -> NICKNAME -> JOB -> LVL)
         function renderAdminAkunTable() {
             const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = '';
             dbData.akun.forEach((acc, idx) => {
                 tbody.innerHTML += `
                     <tr onclick="triggerEdit(${idx})" class="hover:bg-indigo-900/30 border-b border-gray-700/40 transition-colors cursor-pointer group">
                         <td class="p-2.5 font-mono text-gray-200 truncate group-hover:text-indigo-300" title="${acc.id}">${acc.id}</td>
-                        <td class="p-2.5 text-sky-300 font-semibold truncate">${acc.nickname}</td> <!-- Kolom 2: Nickname -->
-                        <td class="p-2.5 text-indigo-300 font-semibold truncate">${acc.karakter}</td> <!-- Kolom 3: Job -->
+                        <td class="p-2.5 text-sky-300 font-semibold truncate">${acc.nickname}</td>
+                        <td class="p-2.5 text-indigo-300 font-semibold truncate">${acc.karakter}</td>
                         <td class="p-2.5 text-amber-400 font-bold text-center">${acc.level}</td>
                     </tr>
                 `;
@@ -466,10 +457,14 @@
                 document.getElementById('infoCharList').innerHTML = '';
                 
                 listKarakter.forEach(char => {
+                    // MODIFIKASI LAYOUT: Struktur diatur w-full (lebar penuh) agar otomatis turun ke bawah membentuk daftar baris vertikal yang rapi
                     document.getElementById('infoCharList').innerHTML += `
-                        <div class="bg-gray-850 p-1 rounded border border-gray-800 text-[10px] truncate flex justify-between items-center">
-                            <span class="text-sky-300 font-bold truncate">🏷️ ${char.nickname}</span>
-                            <span class="text-gray-400 text-[9px] shrink-0 ml-1">(${char.karakter} Lvl.${char.level})</span>
+                        <div class="w-full bg-gray-800 p-2.5 rounded-lg border border-gray-700 text-[11px] flex justify-between items-center shadow-inner">
+                            <span class="text-sky-400 font-bold font-sans truncate mr-2">🏷️ ${char.nickname}</span>
+                            <div class="flex gap-1.5 shrink-0 font-mono text-[10px]">
+                                <span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded border border-indigo-700/60 font-black uppercase tracking-wider">${char.karakter}</span>
+                                <span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded border border-amber-600/60 font-black">LV.${char.level}</span>
+                            </div>
                         </div>
                     `;
                     if(char.catatan && char.catatan !== "-") {
@@ -635,7 +630,7 @@
         });
 
         const emojiInput = document.getElementById('emoji'); const emojiPicker = document.getElementById('emojiPicker');
-        emojiInput.addEventListener('click', (e) => { e.stopPropagation(); emojiPicker.classList.toggle('hidden'); });
+        emojiInput.addEventListener('click', (e) => { e.stopPropagation(); emojiPicker.toggle('hidden'); });
         emojiPicker.querySelectorAll('span').forEach(s => s.addEventListener('click', () => { emojiInput.value = s.innerText; emojiPicker.classList.add('hidden'); }));
         document.addEventListener('click', (e) => { if(!emojiPicker.contains(e.target) && e.target !== emojiInput) emojiPicker.classList.add('hidden'); });
 
